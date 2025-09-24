@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Imagine Church • Missions Kiosk (Portrait 1080×1920)</title>
+  <!-- Prefer local Tailwind for offline use; fallback to CDN if missing -->
+  <link rel="stylesheet" href="tailwind.min.css">
+  <script>
+    (function(){
+      var probe=document.createElement('div');
+      probe.className='hidden h-10 w-10 bg-emerald-700';
+      document.body?document.body.appendChild(probe):document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(probe)});
+      setTimeout(function(){
+        if(!getComputedStyle(probe).backgroundColor || getComputedStyle(probe).backgroundColor==='rgba(0, 0, 0, 0)'){
+          var s=document.createElement('script');
+          s.src='https://cdn.tailwindcss.com';
+          document.head.appendChild(s);
+        }
+        probe.remove();
+      },0);
+    })();
+  </script>
+  <style>
+    :root{
+      /* Theme variables (overridden by selected preset) */
+      --brand:#62b37a;
+      --brand-700:#3b8d5e;
+      --brand-900:#1f5d3f;
+      --on-brand:#06130d;
+      --surface:#0b1220;
+      --surface-2:#0f172a;
+      --on-surface:#d1fae5;
+      --text-base:#d1fae5;
+      --text-muted:#99f6e4;
+      --text-subtle:#a7f3d0;
+      --bg-gradient:linear-gradient(180deg,#022c22 0%,#02131b 55%,#031c28 100%);
+    }
+    body{background:var(--bg-gradient);color:var(--text-base);}
+    .touch{min-height:84px}
+    ::-webkit-scrollbar{width:0;height:0}
+    /* Portrait guidance: constrain main content to 1080px width for 1080×1920 portrait displays */
+    .portrait-wrap{max-width:1080px;margin:0 auto}
+    /* Brand overrides to avoid chasing utility classes */
+    header, footer{ border-color: var(--brand-700) !important; }
+    #dLinks a{ background-color: var(--brand) !important; color: var(--on-brand) !important; }
+    #highlight{ border-color: var(--brand-700) !important; background-color: rgba(11,18,32,0.7) !important; }
+    #detailView .rounded-3xl{ border-color: var(--brand-700) !important; }
+    #qrModal .rounded-3xl{ border-color: var(--brand-700) !important; }
+    /* Cards */
+    .mission-card{ border-color: var(--brand-700) !important; background-color: rgba(15,23,42,0.7) !important; }
+    .mission-chip{ border-color: var(--brand-700) !important; background-color: rgba(15,23,42,0.5) !important; }
+    /* Text tints */
+    .t-subtle{ color: var(--text-subtle) !important; }
+    .t-muted{ color: var(--text-muted) !important; }
+    /* Uniform CTA button style */
+    .btn{ padding: clamp(0.9rem,1.6vw,1.25rem) clamp(1.25rem,2.6vw,2rem); border-radius: 9999px; font-weight: 700; font-size: clamp(1rem,1.8vw,1.375rem); box-shadow: 0 10px 20px rgba(0,0,0,.25); border: 1px solid transparent; transition: transform .15s ease, filter .2s ease; backdrop-filter: saturate(120%); }
+    .btn:active{ transform: scale(0.98); }
+    .btn-primary{ background: var(--brand); color: var(--on-brand); border-color: rgba(255,255,255,.08); }
+    .btn-secondary{ background: rgba(255,255,255,0.08); color: var(--on-surface); border-color: rgba(255,255,255,0.16); }
+    .btn-ghost{ background: transparent; color: var(--on-surface); border-color: rgba(255,255,255,0.15); }
+    .btn-danger{ background: #f87171; color: #111; border-color: #fecaca; }
+    .input-field, .textarea-field, .select-field{
+      width: 100%;
+      border-radius: 1rem;
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(148,163,184,0.25);
+      padding: 0.75rem 1rem;
+      color: var(--on-surface);
+      font-size: 1rem;
+    }
+    .textarea-field{ min-height: 5rem; resize: vertical; }
+    .admin-card{ border-radius: 1.5rem; background: rgba(15,23,42,0.75); border: 1px solid rgba(255,255,255,0.12); padding: 1.25rem; box-shadow: 0 15px 30px rgba(0,0,0,0.25); }
+    .admin-drop{
+      border: 2px dashed rgba(148,163,184,0.4);
+      border-radius: 1.5rem;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      background: rgba(15,23,42,0.35);
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .admin-drop.dragover{
+      border-color: var(--brand);
+      background: rgba(31,41,55,0.6);
+      color: var(--on-surface);
+    }
+    .display-title{ font-size: clamp(2.25rem, 4.5vw, 4.75rem); line-height: 1.1; }
+    .display-lead{ font-size: clamp(1.125rem, 2.25vw, 1.85rem); line-height: 1.45; }
+    .display-h2{ font-size: clamp(1.75rem, 3vw, 2.75rem); line-height: 1.15; }
+    .hero-img{ height: clamp(15rem, 24vh, 28rem); }
+    .admin-icon-btn{
+      padding: 0.4rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: var(--on-surface);
+      border: 1px solid rgba(255,255,255,0.16);
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: transform .15s ease, filter .2s ease;
+    }
+    .admin-icon-btn:active{ transform: scale(0.95); }
+    .admin-icon-btn--danger{ background:#f87171; color:#111; border-color:#fecaca; }
+    @media (min-height: 1700px){
+      .mission-chip{ width: 7.5rem; height: 7.5rem; }
+    }
+    @keyframes tap-bounce {
+      0%,100%{transform:translateY(0) scale(1);}
+      30%{transform:translateY(-6px) scale(1.05);}
+      55%{transform:translateY(0) scale(0.97);}
+      75%{transform:translateY(-2px) scale(1.02);}
+    }
+    .bounce-once{animation:tap-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+  </style>
+</head>
+<body class="min-h-screen">
+  <div id="introScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 text-center px-8">
+    <div class="max-w-xl space-y-4">
+      <h1 class="display-title font-black tracking-tight">Welcome to Imagine Church</h1>
+      <p class="display-lead text-teal-100/90">Tap below to explore how Imagine Church is moving through missions and outreach.</p>
+    </div>
+    <button id="startBtn" class="btn btn-primary touch transition-transform duration-200 focus:outline-none focus:ring-4 active:scale-95">
+      Tap here to get Started
+    </button>
+  </div>
+  <!-- Persistent App Bar with Back + Home -->
+  <header class="hidden sticky top-0 z-40 bg-slate-950/85 backdrop-blur border-b border-emerald-900/60">
+    <div class="portrait-wrap px-5 py-3">
+      <div class="flex flex-col items-center gap-2">
+        <div class="text-center text-teal-200/80 text-sm select-none">
+          <span>Imagine Church • Missions</span>
+        </div>
+        <div class="flex justify-center gap-3">
+          <button id="backBtn" class="btn btn-primary touch inline-flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+            <span>Back</span>
+          </button>
+          <button id="homeBtn" class="btn btn-primary touch inline-flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M2.25 12 12 3l9.75 9v8.25a.75.75 0 0 1-.75.75H3a.75.75 0 0 1-.75-.75z"/></svg>
+            <span>Home</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Announcements ribbon -->
+    <div id="announceBar" class="hidden border-t border-emerald-900/60">
+      <div class="portrait-wrap px-5 py-2 text-sm text-teal-100/90"><span id="announceText"></span></div>
+    </div>
+  </header>
+
+  <!-- Views Container -->
+  <main id="viewRoot" class="hidden min-h-[calc(100dvh-64px)]">
+    <!-- Home View (portrait optimized) -->
+    <section id="homeView" class="portrait-wrap px-5 py-6">
+      <div class="flex flex-col items-center text-center gap-5">
+        <img id="logo" alt="Imagine Church Logo" class="h-28 md:h-36 object-contain"/>
+        <h1 class="display-title font-black tracking-tight">Our Missions</h1>
+        <p class="display-lead text-teal-100/90 max-w-2xl">Tap a card to learn how you can pray, give, or serve with each mission.</p>
+      </div>
+
+      <!-- Dynamic hero / rotating highlights -->
+      <div id="highlight" class="mt-6 rounded-3xl border border-emerald-700/40 bg-slate-900/70 p-5 shadow-xl shadow-emerald-950/30">
+        <div class="flex flex-col gap-5 items-center">
+          <div class="shrink-0 w-full hero-img rounded-2xl bg-emerald-900/60 overflow-hidden">
+            <img id="hlImage" class="w-full h-full object-cover" alt="Mission highlight"/>
+          </div>
+          <div class="w-full text-center">
+            <h2 id="hlTitle" class="display-h2 font-bold"></h2>
+            <p id="hlBlurb" class="mt-2 display-lead text-teal-100/90"></p>
+            <div class="mt-4 flex flex-wrap gap-3 justify-center">
+              <button id="hlOpen" class="btn btn-primary touch">Explore</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Missions Grid (1-col portrait, expands if wider) -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5" id="grid"></div>
+    </section>
+
+    <!-- Detail View -->
+    <section id="detailView" class="hidden">
+      <div class="portrait-wrap px-5 py-6">
+        <div class="rounded-3xl border border-emerald-700/40 bg-slate-950/60 overflow-hidden shadow-2xl shadow-emerald-950/40">
+          <div class="flex flex-col">
+            <div class="h-64 bg-emerald-900/60">
+              <img id="dImage" class="w-full h-full object-cover" alt="Mission image"/>
+            </div>
+            <div class="p-6 space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h2 id="dTitle" class="display-h2 font-bold"></h2>
+                  <p id="dSubtitle" class="display-lead text-teal-100/90"></p>
+                </div>
+                <div class="text-right text-teal-200/70 text-sm">
+                  <div id="dViews" class="">Views: 0</div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 gap-3 text-lg">
+                <div>
+                  <div class="text-teal-200/70 text-sm">Mission Focus</div>
+                  <div id="dFocus"></div>
+                </div>
+                <div>
+                  <div class="text-teal-200/70 text-sm">How to Get Involved</div>
+                  <div id="dInvolved"></div>
+                </div>
+                <div>
+                  <div class="text-teal-200/70 text-sm">Contact</div>
+                  <div id="dContact"></div>
+                </div>
+              </div>
+              <div class="pt-2 flex flex-wrap gap-3" id="dLinks"></div>
+              <div class="pt-2">
+                <button id="qrBtn" class="btn btn-primary touch">Show QR to open on my phone</button>
+              </div>
+            </div>
+          </div>
+          <div class="p-6 border-t border-emerald-900/60">
+            <h3 class="text-xl font-semibold">About this Mission</h3>
+            <p id="dBody" class="mt-2 text-teal-100/90"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="fixed inset-0 hidden">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-close="qr"></div>
+    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:h-auto sm:w-[480px] rounded-t-3xl sm:rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-4 shadow-2xl shadow-emerald-950/40">
+      <div class="flex items-center justify-between">
+        <h4 class="text-xl font-bold">Scan to open on your phone</h4>
+        <button class="btn btn-secondary touch" data-close="qr">Close</button>
+      </div>
+      <div class="flex flex-col items-center gap-3">
+        <div id="qrCanvasWrap" class="rounded-2xl bg-white p-3 shadow-lg shadow-emerald-950/20">
+          <canvas id="qrCanvas" width="300" height="300"></canvas>
+        </div>
+        <div class="text-teal-100/80 text-sm">Point your camera at the code</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/85 border-t border-emerald-900/60">
+    <div class="portrait-wrap px-5 py-2 flex items-center text-teal-200/70 text-sm gap-3">
+      <span id="footerTip">Tap Back or Home anytime • Idle reset after <span id="footerIdle">60</span>s</span>
+    </div>
+  </footer>
+
+  <!-- Admin Modal (hidden; opens via 5-tap on header title) -->
+  <div id="adminModal" class="fixed inset-0 hidden">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-close="admin"></div>
+    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:h-auto sm:w-[620px] rounded-t-3xl sm:rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-5 shadow-2xl shadow-emerald-950/40">
+      <div class="flex items-center justify-between">
+        <h4 class="text-xl font-bold">Admin</h4>
+        <button class="btn btn-secondary touch" data-close="admin">Close</button>
+      </div>
+      <div id="adminPinWrap" class="space-y-3">
+        <label class="block text-sm text-teal-200/80">Enter PIN</label>
+        <input id="adminPin" type="password" inputmode="numeric" class="input-field" placeholder="••••" />
+        <button id="adminPinBtn" class="btn btn-primary touch">Unlock</button>
+        <div id="adminPinMsg" class="text-sm text-red-300 hidden">Incorrect PIN</div>
+      </div>
+      <div id="adminBody" class="hidden space-y-6 text-sm">
+        <section id="adminSummary" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></section>
+
+        <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Content Source</h5>
+          <p class="text-teal-200/80 text-xs sm:text-sm">Load missions from CSV (columns: id,title,subtitle,focus,involved,contact,body,image,links). Data stays on this kiosk.</p>
+          <p class="text-teal-200/60 text-xs sm:text-sm">Drop mission images in <code>images/missions/</code> and shared graphics in <code>images/general/</code>. Reference them from CSV like <code>images/missions/your-photo.jpg</code>.</p>
+          <input id="csvInput" type="file" accept=".csv,text/csv" class="input-field" />
+          <div class="flex flex-wrap gap-3">
+            <button id="adminSaveBtn" class="btn btn-primary touch">Apply & Save</button>
+            <button id="adminDownloadBtn" class="btn btn-secondary touch">Download Current Data</button>
+            <button id="adminClearBtn" class="btn btn-danger touch">Clear Stored Data</button>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Image Library</h5>
+          <p class="text-teal-200/80 text-xs sm:text-sm">Chromium-only shortcut: pick your local folders once per session, then drag files in. Files save directly to the kiosk.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="admin-card space-y-2">
+              <div class="text-xs uppercase tracking-wide text-teal-200/70">Missions folder</div>
+              <button id="pickMissionsDir" class="btn btn-secondary touch">Choose missions folder</button>
+              <div id="missionsDirLabel" class="text-xs text-teal-200/70 truncate">Not selected</div>
+            </div>
+            <div class="admin-card space-y-2">
+              <div class="text-xs uppercase tracking-wide text-teal-200/70">General images folder</div>
+              <button id="pickGeneralDir" class="btn btn-secondary touch">Choose general folder</button>
+              <div id="generalDirLabel" class="text-xs text-teal-200/70 truncate">Not selected</div>
+            </div>
+          </div>
+          <div class="admin-card space-y-3">
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="text-xs uppercase tracking-wide text-teal-200/70">Save to</label>
+              <select id="imageTargetSelect" class="select-field max-w-[220px]">
+                <option value="missions">Missions (images/missions)</option>
+                <option value="general">General (images/general)</option>
+              </select>
+              <input id="imageFileInput" type="file" accept="image/*" multiple class="hidden" />
+              <button id="imageFileBrowse" class="btn btn-secondary touch">Browse files</button>
+            </div>
+            <div id="imageDrop" class="admin-drop">
+              <div class="text-sm font-semibold">Drop images here</div>
+              <div class="text-xs">or click <span class="underline">Browse files</span></div>
+              <div class="text-xs text-teal-200/60">Saved to <span id="imageTargetLabel">images/missions/</span></div>
+            </div>
+            <div id="imageStatus" class="text-xs text-teal-200/70"></div>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Display Settings</h5>
+          <label class="block space-y-2">
+            <span class="text-teal-200/80">Announcement message</span>
+            <textarea id="adminAnnouncement" class="textarea-field" placeholder="Optional welcome or announcement..."></textarea>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="block space-y-2">
+              <span class="text-teal-200/80">Idle reset (seconds)</span>
+              <input id="adminIdle" type="number" min="10" class="input-field" />
+            </label>
+            <label class="block space-y-2">
+              <span class="text-teal-200/80">Highlight rotation (seconds)</span>
+              <input id="adminHighlight" type="number" min="3" class="input-field" />
+            </label>
+          </div>
+          <label class="block space-y-2">
+            <span class="text-teal-200/80">Theme</span>
+            <select id="adminTheme" class="select-field"></select>
+          </label>
+        </section>
+
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h5 class="text-base font-semibold text-teal-100/90">Missions</h5>
+            <button id="adminAddMission" class="btn btn-secondary touch">Add Mission</button>
+          </div>
+          <div class="text-teal-200/70 text-xs">Edit fields or reorder; changes apply after saving.</div>
+          <div id="adminMissionList" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Config ----------
+    const ASSET_ROOT = 'images'; // local assets live under ./images
+    const MISSION_IMAGE_DIR = `${ASSET_ROOT}/missions/`;
+    const GENERAL_IMAGE_DIR = `${ASSET_ROOT}/general/`;
+    const LOGO_URL = `${GENERAL_IMAGE_DIR}logo.png`; // drop logo.png into images/general/
+    // Optional Google Sheets CSV (File > Share > Publish to web > CSV). Columns: id,title,subtitle,focus,involved,contact,body,image,links
+    // links should be semicolon-separated pairs like Label|https://url
+    const SHEET_CSV_URL = ""; // e.g., "https://docs.google.com/spreadsheets/d/.../pub?output=csv"
+    const ADMIN_PIN = "112200"; // Change this PIN
+
+    const THEMES = {
+      evergreen: {
+        label: 'Evergreen',
+        gradient: 'linear-gradient(180deg,#022c22 0%,#02131b 55%,#031c28 100%)',
+        vars: {
+          '--brand':'#62b37a',
+          '--brand-700':'#3b8d5e',
+          '--brand-900':'#1f5d3f',
+          '--on-brand':'#06130d',
+          '--surface':'#0b1220',
+          '--surface-2':'#0f172a',
+          '--on-surface':'#d1fae5',
+          '--text-base':'#d1fae5',
+          '--text-muted':'#99f6e4',
+          '--text-subtle':'#a7f3d0'
+        }
+      },
+      ocean: {
+        label: 'Ocean',
+        gradient: 'linear-gradient(180deg,#061537 0%,#031a2e 55%,#06253f 100%)',
+        vars: {
+          '--brand':'#38bdf8',
+          '--brand-700':'#0ea5e9',
+          '--brand-900':'#0369a1',
+          '--on-brand':'#02121d',
+          '--surface':'#071224',
+          '--surface-2':'#0b172d',
+          '--on-surface':'#cfe9ff',
+          '--text-base':'#dbeafe',
+          '--text-muted':'#bae6fd',
+          '--text-subtle':'#c4e1ff'
+        }
+      },
+      ember: {
+        label: 'Ember',
+        gradient: 'linear-gradient(180deg,#2d0a0a 0%,#170608 55%,#2f1216 100%)',
+        vars: {
+          '--brand':'#fb923c',
+          '--brand-700':'#ea580c',
+          '--brand-900':'#9a3412',
+          '--on-brand':'#2a0f05',
+          '--surface':'#1a0909',
+          '--surface-2':'#210d0d',
+          '--on-surface':'#fde8d3',
+          '--text-base':'#fee7d3',
+          '--text-muted':'#fcd2b8',
+          '--text-subtle':'#fdba74'
+        }
+      }
+    };
+
+    let settings = {
+      announcement: '',
+      idleMs: 60000,
+      highlightMs: 8000,
+      theme: 'evergreen'
+    };
+
+    let meta = {
+      updatedAt: null
+    };
+
+    // Mission data (fallback if no sheet)
+    const DEFAULT_MISSIONS = [
+      {
+        id: 'kairos',
+        title: 'Cookies for Kairos',
+        subtitle: 'Bake hope. Share grace with those inside.',
+        focus: 'Support Kairos Prison Ministry by baking dozens of cookies for weekend retreats.',
+        involved: 'Bake 2–4 dozen cookies, pray over each batch, drop off by the due date.',
+        contact: 'missions@imaginechurchnow.com',
+        body: 'Kairos brings the love and forgiveness of Jesus Christ to incarcerated individuals and their families. Cookies are a tangible way to open hearts and start conversations.',
+        image: `${MISSION_IMAGE_DIR}kairos.jpg`, // place kairos.jpg under images/missions/
+        links: [
+          { label: 'Cookie Guidelines (PDF)', href: '#' },
+          { label: 'Sign Up', href: '#' }
+        ]
+      },
+      {
+        id: 'trauma',
+        title: 'Trauma Center',
+        subtitle: 'Care for the wounded. Restore dignity and hope.',
+        focus: 'Partner with local trauma recovery services to provide supplies and volunteer hours.',
+        involved: 'Donate gift cards / hygiene kits, volunteer for intake or prayer team.',
+        contact: 'care@imaginechurchnow.com',
+        body: 'We serve survivors with practical resources, compassionate presence, and pathways to long‑term healing.',
+        image: `${MISSION_IMAGE_DIR}trauma.jpg`,
+        links: [
+          { label: 'Needed Items List', href: '#' },
+          { label: 'Volunteer Form', href: '#' }
+        ]
+      },
+      {
+        id: 'other',
+        title: 'Some Other Thing',
+        subtitle: 'Another local or global mission focus.',
+        focus: 'Describe the cause and the practical impact here.',
+        involved: 'Provide 2–3 clear next steps to engage.',
+        contact: 'hello@imaginechurchnow.com',
+        body: 'Use this slot for a rotating or seasonal mission (e.g., school supply drive, Honduras trip, etc.).',
+        image: `${MISSION_IMAGE_DIR}seasonal.jpg`,
+        links: [ { label: 'Learn More', href: '#' } ]
+      }
+    ];
+
+    let MISSIONS = cloneMissions(DEFAULT_MISSIONS);
+
+    // ---------- State & Elements ----------
+    const $ = s => document.querySelector(s);
+    const homeView = $('#homeView');
+    const detailView = $('#detailView');
+    const backBtn = $('#backBtn');
+    const homeBtn = $('#homeBtn');
+    const headerEl = document.querySelector('header');
+    const mainEl = document.querySelector('main');
+    const introScreen = $('#introScreen');
+    const startBtn = $('#startBtn');
+
+    // Home elements
+    const grid = $('#grid');
+    const logoEl = $('#logo');
+    const hlTitle = $('#hlTitle');
+    const hlBlurb = $('#hlBlurb');
+    const hlImage = $('#hlImage');
+    const hlOpen = $('#hlOpen');
+
+    // Detail elements
+    const dTitle = $('#dTitle');
+    const dSubtitle = $('#dSubtitle');
+    const dFocus = $('#dFocus');
+    const dInvolved = $('#dInvolved');
+    const dContact = $('#dContact');
+    const dBody = $('#dBody');
+    const dImage = $('#dImage');
+    const dLinks = $('#dLinks');
+    const dViews = $('#dViews');
+
+    // Announcements
+    const announceBar = $('#announceBar');
+    const announceText = $('#announceText');
+
+    // QR modal
+    const qrModal = $('#qrModal');
+    const qrCanvas = $('#qrCanvas');
+
+    // Admin elements
+    const adminModal = $('#adminModal');
+    const adminPinWrap = $('#adminPinWrap');
+    const adminBody = $('#adminBody');
+    const adminPin = $('#adminPin');
+    const adminPinBtn = $('#adminPinBtn');
+    const adminPinMsg = $('#adminPinMsg');
+    const csvInput = $('#csvInput');
+    const adminSaveBtn = $('#adminSaveBtn');
+    const adminClearBtn = $('#adminClearBtn');
+    const adminDownloadBtn = $('#adminDownloadBtn');
+    const adminSummary = $('#adminSummary');
+    const adminAnnouncementInput = $('#adminAnnouncement');
+    const adminIdleInput = $('#adminIdle');
+    const adminHighlightInput = $('#adminHighlight');
+    const adminThemeSelect = $('#adminTheme');
+    const adminMissionList = $('#adminMissionList');
+    const adminAddMission = $('#adminAddMission');
+    const pickMissionsDirBtn = $('#pickMissionsDir');
+    const pickGeneralDirBtn = $('#pickGeneralDir');
+    const missionsDirLabel = $('#missionsDirLabel');
+    const generalDirLabel = $('#generalDirLabel');
+    const imageTargetSelect = $('#imageTargetSelect');
+    const imageTargetLabel = $('#imageTargetLabel');
+    const imageDrop = $('#imageDrop');
+    const imageStatus = $('#imageStatus');
+    const imageFileBrowse = $('#imageFileBrowse');
+    const imageFileInput = $('#imageFileInput');
+    const footerIdle = $('#footerIdle');
+
+    let historyStack = []; // simple history for Back
+    let appStarted = false;
+    let highlightTimer = null;
+    let pendingMissions = [];
+    let pendingSettings = null;
+    let missionsDirHandle = null;
+    let generalDirHandle = null;
+
+    function startApp(){
+      if(appStarted) return;
+      appStarted = true;
+      introScreen?.classList.add('hidden');
+      headerEl?.classList.remove('hidden');
+      mainEl?.classList.remove('hidden');
+      show('home');
+      resetIdle();
+    }
+
+    startBtn?.addEventListener('click', startApp);
+    startBtn?.addEventListener('pointerdown', () => triggerBounce(startBtn));
+
+    // ---------- Helpers ----------
+    function show(view) {
+      if (view === 'home') {
+        homeView.classList.remove('hidden');
+        detailView.classList.add('hidden');
+      } else {
+        homeView.classList.add('hidden');
+        detailView.classList.remove('hidden');
+      }
+      if(appStarted){ resetIdle(); }
+    }
+
+    function gotoHome() {
+      historyStack = [];
+      show('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function parseLinks(str){
+      // "Label|https://url; Another|https://..."
+      if(!str) return [];
+      return str.split(';').map(s=>s.trim()).filter(Boolean).map(p=>{const [label,href] = p.split('|');return {label:label?.trim()||'Open', href:href?.trim()||'#'};});
+    }
+    function serializeLinks(links){
+      if(!Array.isArray(links)) return '';
+      return links.map(l=>`${l.label||'Link'}|${l.href||'#'}`).join('; ');
+    }
+
+    function saveLocalData(data){
+      try{
+        localStorage.setItem('missions:data', JSON.stringify(data));
+        meta.updatedAt = Date.now();
+        localStorage.setItem('missions:meta', JSON.stringify(meta));
+      }catch(e){ console.warn('local save failed', e); }
+    }
+    function loadLocalData(){
+      try{
+        const raw = localStorage.getItem('missions:data');
+        if(!raw) return null;
+        const data = JSON.parse(raw);
+        if(Array.isArray(data) && data.length) return data;
+      }catch(e){ console.warn('local load failed', e); }
+      return null;
+    }
+
+    function loadMeta(){
+      try{
+        const raw = localStorage.getItem('missions:meta');
+        if(!raw) return;
+        const stored = JSON.parse(raw);
+        if(stored && typeof stored.updatedAt === 'number'){ meta.updatedAt = stored.updatedAt; }
+      }catch(e){ console.warn('meta load failed', e); }
+    }
+
+    function loadSettings(){
+      try{
+        const raw = localStorage.getItem('missions:settings');
+        if(raw){
+          const stored = JSON.parse(raw);
+          if(stored && typeof stored === 'object'){ settings = { ...settings, ...stored }; }
+        }
+      }catch(e){ console.warn('settings load failed', e); }
+      if(!THEMES[settings.theme]){ settings.theme = 'evergreen'; }
+    }
+
+    function saveSettings(){
+      try{ localStorage.setItem('missions:settings', JSON.stringify(settings)); }
+      catch(e){ console.warn('settings save failed', e); }
+    }
+
+    function applyTheme(themeKey){
+      const theme = THEMES[themeKey] || THEMES.evergreen;
+      Object.entries(theme.vars).forEach(([key,val])=> document.documentElement.style.setProperty(key, val));
+      document.documentElement.style.setProperty('--bg-gradient', theme.gradient);
+      document.body.style.background = theme.gradient;
+      document.body.style.color = theme.vars['--text-base'] || '#f8fafc';
+    }
+
+    function updateFooter(){
+      if(footerIdle){ footerIdle.textContent = Math.round((settings.idleMs||60000)/1000); }
+    }
+
+    function updateAnnouncement(){
+      const text = (settings.announcement||'').trim();
+      if(text){
+        announceText.textContent = text;
+        announceBar.classList.remove('hidden');
+      }else{
+        announceBar.classList.add('hidden');
+      }
+    }
+
+    function escapeAttr(val){
+      return (val||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    }
+
+    function formatDate(ts){
+      if(!ts) return 'Never';
+      try{
+        return new Date(ts).toLocaleString(undefined,{ dateStyle:'medium', timeStyle:'short' });
+      }catch(e){ return 'Never'; }
+    }
+
+    function getViewsFor(id){
+      return parseInt(localStorage.getItem('views:'+id)||'0',10) || 0;
+    }
+
+    function getTotalViews(list){
+      return (list||MISSIONS).reduce((sum,m)=> sum + getViewsFor(m.id), 0);
+    }
+
+    function cloneMissions(list){
+      return JSON.parse(JSON.stringify(list || []));
+    }
+
+    const FS_SUPPORTED = 'showDirectoryPicker' in window;
+
+    function updateImageUI(){
+      if(!imageStatus) return;
+      if(!FS_SUPPORTED){
+        imageStatus.textContent = 'Direct upload not supported in this browser. Use the OS to copy images.';
+        imageStatus.classList.add('text-red-300');
+        pickMissionsDirBtn?.setAttribute('disabled','true');
+        pickGeneralDirBtn?.setAttribute('disabled','true');
+        imageFileBrowse?.setAttribute('disabled','true');
+        if(imageTargetSelect) imageTargetSelect.disabled = true;
+        if(imageDrop) imageDrop.classList.add('opacity-60');
+        return;
+      }
+      imageStatus.textContent = 'Select a destination, then drag images or browse files. Changes persist immediately.';
+    }
+
+    function setDirLabel(labelEl, handle){
+      if(!labelEl) return;
+      labelEl.textContent = handle ? handle.name || '(selected)' : 'Not selected';
+    }
+
+    async function pickDirectory(which){
+      if(!FS_SUPPORTED) return;
+      try{
+        const dirHandle = await window.showDirectoryPicker();
+        if(!dirHandle) return;
+        if(which==='missions'){ missionsDirHandle = dirHandle; setDirLabel(missionsDirLabel, dirHandle); }
+        if(which==='general'){ generalDirHandle = dirHandle; setDirLabel(generalDirLabel, dirHandle); }
+        if(imageStatus){
+          imageStatus.classList.remove('text-red-300');
+          imageStatus.textContent = `Ready to save into ${imageTargetSelect?.value==='general' ? (generalDirHandle?.name||'general folder') : (missionsDirHandle?.name||'missions folder')}.`;
+        }
+      }catch(err){
+        console.warn('Directory pick cancelled', err);
+      }
+    }
+
+    async function ensurePermission(handle){
+      if(!handle) return false;
+      if(handle.requestPermission){
+        const opts = { mode:'readwrite' };
+        if(await handle.queryPermission(opts) === 'granted') return true;
+        return await handle.requestPermission(opts) === 'granted';
+      }
+      return true;
+    }
+
+    async function writeFileToDir(dirHandle, file){
+      if(!dirHandle) throw new Error('Directory not selected');
+      const permitted = await ensurePermission(dirHandle);
+      if(!permitted) throw new Error('Permission denied');
+      const targetHandle = await dirHandle.getFileHandle(file.name, { create:true });
+      const writable = await targetHandle.createWritable();
+      await writable.write(file);
+      await writable.close();
+      return `${dirHandle.name}/${file.name}`;
+    }
+
+    async function handleImageFiles(fileList){
+      if(!FS_SUPPORTED){ return; }
+      if(!fileList || !fileList.length) return;
+      const target = imageTargetSelect?.value || 'missions';
+      const dirHandle = target === 'general' ? generalDirHandle : missionsDirHandle;
+      if(!dirHandle){
+        if(imageStatus){
+          imageStatus.textContent = `Select a ${target} folder before uploading.`;
+          imageStatus.classList.add('text-red-300');
+        }
+        return;
+      }
+      if(imageStatus){
+        imageStatus.classList.remove('text-red-300');
+        imageStatus.textContent = 'Saving files...';
+      }
+      const savedNames = [];
+      const errors = [];
+      for(const file of fileList){
+        try{
+          const savedPath = await writeFileToDir(dirHandle, file);
+          savedNames.push(file.name);
+        }catch(err){
+          console.warn('Save failed', err);
+          errors.push(`${file.name}: ${err.message||'error'}`);
+        }
+      }
+      const prefix = target === 'general' ? GENERAL_IMAGE_DIR : MISSION_IMAGE_DIR;
+      const lines = [];
+      if(savedNames.length){
+        lines.push(`Saved ${savedNames.length} file${savedNames.length>1?'s':''}. Reference paths like <code>${prefix}${savedNames[0]}</code>${savedNames.length>1?` (or ${prefix}${savedNames[1]})`:''}`);
+      }
+      if(errors.length){
+        lines.push(`<span class="text-red-300">Errors:</span> ${errors.join(', ')}`);
+      }
+      if(imageStatus){ imageStatus.innerHTML = lines.join('<br/>') || 'No files processed.'; }
+    }
+
+    function renderAdminSummary(){
+      if(!adminSummary) return;
+      const source = pendingMissions.length ? pendingMissions : MISSIONS;
+      const cards = [
+        { label:'Missions', value: source.length },
+        { label:'Last Update', value: formatDate(meta.updatedAt) },
+        { label:'Total Views', value: getTotalViews(source) }
+      ];
+      adminSummary.innerHTML = cards.map(card => `
+        <div class="admin-card">
+          <div class="text-xs text-teal-200/70 uppercase tracking-widest">${card.label}</div>
+          <div class="mt-3 text-3xl font-bold">${card.value}</div>
+        </div>
+      `).join('');
+    }
+
+    function missionRowTemplate(m, idx){
+      return `
+        <div class="admin-card space-y-3" data-index="${idx}">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="font-semibold">${idx + 1}. ${escapeAttr(m.title) || 'Untitled Mission'}</div>
+              <div class="text-xs text-teal-200/60">Views: ${getViewsFor(m.id)}</div>
+            </div>
+            <div class="flex gap-2 text-xs">
+              <button class="admin-icon-btn" data-action="up" title="Move up">↑</button>
+              <button class="admin-icon-btn" data-action="down" title="Move down">↓</button>
+              <button class="admin-icon-btn admin-icon-btn--danger" data-action="remove" title="Remove">✕</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+              <span>Title</span>
+              <input class="input-field" data-field="title" value="${escapeAttr(m.title)}" />
+            </label>
+            <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+              <span>Subtitle</span>
+              <input class="input-field" data-field="subtitle" value="${escapeAttr(m.subtitle)}" />
+            </label>
+          </div>
+          <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+            <span>Focus</span>
+            <textarea class="textarea-field" data-field="focus">${escapeAttr(m.focus)}</textarea>
+          </label>
+          <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+            <span>How to Get Involved</span>
+            <textarea class="textarea-field" data-field="involved">${escapeAttr(m.involved)}</textarea>
+          </label>
+          <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+            <span>Body Copy</span>
+            <textarea class="textarea-field" data-field="body">${escapeAttr(m.body)}</textarea>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+              <span>Contact</span>
+              <input class="input-field" data-field="contact" value="${escapeAttr(m.contact)}" />
+            </label>
+            <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+              <span>Image URL</span>
+              <input class="input-field" data-field="image" value="${escapeAttr(m.image)}" />
+            </label>
+          </div>
+          <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
+            <span>Links (Label|URL; another|URL)</span>
+            <textarea class="textarea-field" data-field="links">${escapeAttr(serializeLinks(m.links))}</textarea>
+          </label>
+        </div>
+      `;
+    }
+
+    function renderAdminMissions(){
+      if(!adminMissionList) return;
+      if(!pendingMissions.length){
+        adminMissionList.innerHTML = '<div class="text-center text-teal-200/60 py-6">No missions loaded yet.</div>';
+        renderAdminSummary();
+        return;
+      }
+      adminMissionList.innerHTML = pendingMissions.map(missionRowTemplate).join('');
+      adminMissionList.querySelectorAll('[data-index]').forEach(row => {
+        const idx = Number(row.dataset.index);
+        const titleEl = row.querySelector('.font-semibold');
+        row.querySelectorAll('[data-field]').forEach(input => {
+          const field = input.dataset.field;
+          input.addEventListener('input', e => {
+            const value = e.target.value;
+            if(field === 'links'){
+              pendingMissions[idx].links = parseLinks(value);
+            } else {
+              pendingMissions[idx][field] = value;
+            }
+            if(field === 'title' && titleEl){ // update heading label
+              titleEl.textContent = `${idx+1}. ${pendingMissions[idx].title || 'Untitled Mission'}`;
+            }
+          });
+        });
+        row.querySelectorAll('[data-action]').forEach(btn => {
+          const action = btn.dataset.action;
+          btn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            if(action === 'up' && idx>0){
+              const tmp = pendingMissions[idx-1]; pendingMissions[idx-1] = pendingMissions[idx]; pendingMissions[idx] = tmp;
+              renderAdminMissions();
+            } else if(action === 'down' && idx < pendingMissions.length-1){
+              const tmp = pendingMissions[idx+1]; pendingMissions[idx+1] = pendingMissions[idx]; pendingMissions[idx] = tmp;
+              renderAdminMissions();
+            } else if(action === 'remove'){
+              pendingMissions.splice(idx,1);
+              renderAdminMissions();
+            }
+          });
+        });
+      });
+      renderAdminSummary();
+    }
+
+    function initAdminPanel(){
+      pendingMissions = cloneMissions(MISSIONS);
+      pendingSettings = { ...settings };
+      if(adminAnnouncementInput){ adminAnnouncementInput.value = pendingSettings.announcement || ''; }
+      if(adminIdleInput){ adminIdleInput.value = Math.round((pendingSettings.idleMs||60000)/1000); }
+      if(adminHighlightInput){ adminHighlightInput.value = Math.round((pendingSettings.highlightMs||8000)/1000); }
+      if(adminThemeSelect){
+        adminThemeSelect.innerHTML = Object.entries(THEMES).map(([key,theme])=>`<option value="${key}">${theme.label}</option>`).join('');
+        adminThemeSelect.value = pendingSettings.theme || settings.theme;
+      }
+      updateImageUI();
+      setDirLabel(missionsDirLabel, missionsDirHandle);
+      setDirLabel(generalDirLabel, generalDirHandle);
+      if(imageTargetLabel){
+        const target = imageTargetSelect?.value === 'general' ? GENERAL_IMAGE_DIR : MISSION_IMAGE_DIR;
+        imageTargetLabel.textContent = target;
+      }
+      renderAdminSummary();
+      renderAdminMissions();
+    }
+
+    function openAdmin(){
+      adminModal.classList.remove('hidden');
+      adminPinWrap.classList.remove('hidden');
+      adminBody.classList.add('hidden');
+      adminPin.value='';
+      adminPinMsg.classList.add('hidden');
+    }
+    function closeAdmin(){
+      adminModal.classList.add('hidden');
+      applyTheme(settings.theme);
+      updateAnnouncement();
+      updateFooter();
+    }
+
+    function triggerBounce(el){
+      if(!el) return;
+      el.classList.remove('bounce-once');
+      // Force reflow so the animation can restart
+      void el.offsetWidth;
+      el.classList.add('bounce-once');
+    }
+
+    dImage?.addEventListener('pointerdown', () => triggerBounce(dImage));
+
+    function gotoDetail(id) {
+      const m = MISSIONS.find(x => x.id === id);
+      if (!m) return;
+      // push state for back
+      historyStack.push('home');
+      // fill detail
+      dTitle.textContent = m.title;
+      dSubtitle.textContent = m.subtitle || '';
+      dFocus.textContent = m.focus || '—';
+      dInvolved.textContent = m.involved || '—';
+      dContact.innerHTML = m.contact ? `<a class="inline-flex items-center gap-2 text-cyan-200 underline decoration-cyan-300/70 decoration-2 underline-offset-4" href="mailto:${m.contact}">${m.contact}</a>` : '—';
+      dBody.textContent = m.body || '';
+      dImage.src = m.image || '';
+      triggerBounce(dImage);
+      dLinks.innerHTML = (m.links||[]).map(l => `<a class="btn btn-primary touch inline-flex items-center justify-center" target="_blank" rel="noopener" href="${l.href}">${l.label}</a>`).join('');
+      // analytics (local only, per mission)
+      const key = 'views:'+id;
+      const count = (parseInt(localStorage.getItem(key)||'0',10)+1);
+      localStorage.setItem(key, String(count));
+      dViews.textContent = 'Views: '+count;
+      // QR button
+      const dUrl = location.href; // current kiosk URL or file path
+      const deepLink = (m.links && m.links[0]?.href && m.links[0].href !== '#') ? m.links[0].href : dUrl;
+      document.getElementById('qrBtn').onclick = () => openQR(deepLink);
+      show('detail');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function back() {
+      if (historyStack.length === 0) { gotoHome(); return; }
+      const prev = historyStack.pop();
+      if (prev === 'home') gotoHome();
+    }
+
+    function card(m) {
+      return `
+        <button class="mission-card group touch text-left p-5 rounded-3xl border transition-transform active:scale-[0.99]" data-id="${m.id}">
+          <div class="flex items-start gap-3">
+            <div class="grow">
+              <div class="text-xs uppercase tracking-wider t-muted">Mission</div>
+              <div class="mt-1 text-2xl font-bold">${m.title}</div>
+              <div class="mt-2 t-subtle">${m.subtitle||''}</div>
+            </div>
+            <div class="mission-chip shrink-0 w-24 h-24 rounded-2xl overflow-hidden border">
+              <img class="mission-visual w-full h-full object-cover" src="${m.image||''}" alt="${m.title}"/>
+            </div>
+          </div>
+        </button>`;
+    }
+
+    function renderHome() {
+      // logo
+      logoEl.src = LOGO_URL;
+      logoEl.onerror = () => { logoEl.replaceWith(Object.assign(document.createElement('div'), {className:'text-2xl font-black', textContent:'Imagine Church'})); };
+
+      // grid
+      grid.innerHTML = MISSIONS.map(card).join('');
+      grid.querySelectorAll('button[data-id]').forEach(btn => {
+        const img = btn.querySelector('.mission-visual');
+        const id = btn.dataset.id;
+        btn.onclick = () => gotoDetail(id);
+        btn.onpointerdown = () => triggerBounce(img || btn);
+      });
+      hlOpen.onpointerdown = () => triggerBounce(hlImage);
+
+      // rotating highlight
+      let i = 0;
+      function setHl(idx) {
+        const m = MISSIONS[idx % MISSIONS.length];
+        if(!m) return;
+        hlTitle.textContent = m.title||'';
+        hlBlurb.textContent = m.subtitle||'';
+        hlImage.src = m.image||'';
+        hlOpen.onclick = () => gotoDetail(m.id);
+      }
+      setHl(0);
+      if(highlightTimer) clearInterval(highlightTimer);
+      if(MISSIONS.length>1){
+        const interval = Math.max(3000, settings.highlightMs || 8000);
+        highlightTimer = setInterval(() => { i = (i+1)%MISSIONS.length; setHl(i); }, interval);
+      }
+
+      updateAnnouncement();
+      renderAdminSummary();
+    }
+
+    // ---------- Idle Reset ----------
+    let idleTimer = null;
+    function resetIdle(){
+      if(!appStarted) return;
+      if(idleTimer)clearTimeout(idleTimer);
+      idleTimer=setTimeout(gotoHome, settings.idleMs || 60000);
+    }
+    ['pointerdown','keydown','touchstart'].forEach(evt=>document.addEventListener(evt, resetIdle, {passive:true}));
+
+    // ---------- Wire up ----------
+    document.addEventListener('click', (e)=>{
+      if(e.target.dataset && e.target.dataset.close==='qr'){ closeQR(); }
+      if(e.target.dataset && e.target.dataset.close==='admin'){ closeAdmin(); }
+    });
+    backBtn.addEventListener('click', back);
+    homeBtn.addEventListener('click', gotoHome);
+
+    // ---------- CSV fetch (optional Google Sheets) ----------
+    async function fetchCSV(url){
+      const res = await fetch(url);
+      const txt = await res.text();
+      const lines = txt.split(/\r?\n/).filter(Boolean);
+      const headers = lines.shift().split(',').map(h=>h.trim());
+      function parseCSVRow(row){
+        const parts=[]; let cur=''; let q=false; for(let i=0;i<row.length;i++){const c=row[i]; if(c==='"'){q=!q; continue;} if(c===',' && !q){parts.push(cur); cur='';} else {cur+=c;}} parts.push(cur); return parts; }
+      const out = lines.map(line=>{
+        const cols = parseCSVRow(line).map(c=>c.trim());
+        const obj = {}; headers.forEach((h,i)=>obj[h]=cols[i]||'');
+        return {
+          id: obj.id||obj.title?.toLowerCase().replace(/\s+/g,'-')||String(Math.random()).slice(2),
+          title: obj.title||'',
+          subtitle: obj.subtitle||'',
+          focus: obj.focus||'',
+          involved: obj.involved||'',
+          contact: obj.contact||'',
+          body: obj.body||'',
+          image: obj.image||'',
+          links: parseLinks(obj.links||'')
+        };
+      });
+      return out;
+    }
+
+    // Admin: 5-tap gesture on header title
+    (function(){
+      const titleNode = document.querySelector('header .portrait-wrap span');
+      if(!titleNode) return;
+      let taps = 0, last = 0;
+      titleNode.addEventListener('click', ()=>{
+        const now = Date.now();
+        if(now - last > 1500){ taps = 0; }
+        taps++;
+        last = now;
+        if(taps >= 5){ taps = 0; openAdmin(); }
+      });
+    })();
+
+    // Admin: PIN and CSV handling
+    adminPinBtn?.addEventListener('click', ()=>{
+      if(adminPin.value === ADMIN_PIN){
+        adminPinWrap.classList.add('hidden');
+        adminBody.classList.remove('hidden');
+        adminPinMsg.classList.add('hidden');
+        initAdminPanel();
+      } else {
+        adminPinMsg.classList.remove('hidden');
+      }
+    });
+
+    csvInput?.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      const txt = await file.text();
+      const lines = txt.split(/\r?\n/).filter(Boolean);
+      if(!lines.length) return;
+      const headers = lines.shift().split(',').map(h=>h.trim());
+      function parseCSVRow(row){ const parts=[]; let cur=''; let q=false; for(let i=0;i<row.length;i++){const c=row[i]; if(c==='"'){q=!q; continue;} if(c===',' && !q){parts.push(cur); cur='';} else {cur+=c;}} parts.push(cur); return parts; }
+      const out = lines.map(line=>{
+        const cols = parseCSVRow(line).map(c=>c.trim());
+        const obj = {}; headers.forEach((h,i)=>obj[h]=cols[i]||'');
+        return {
+          id: obj.id||obj.title?.toLowerCase().replace(/\s+/g,'-')||String(Math.random()).slice(2),
+          title: obj.title||'',
+          subtitle: obj.subtitle||'',
+          focus: obj.focus||'',
+          involved: obj.involved||'',
+          contact: obj.contact||'',
+          body: obj.body||'',
+          image: obj.image||'',
+          links: parseLinks(obj.links||'')
+        };
+      });
+      pendingMissions = cloneMissions(out);
+      renderAdminMissions();
+      renderAdminSummary();
+      e.target.value = '';
+    });
+
+    function downloadData(){
+      try{
+        const payload = {
+          missions: MISSIONS,
+          settings,
+          updatedAt: meta.updatedAt
+        };
+        const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = `missions-export-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        setTimeout(()=>URL.revokeObjectURL(url), 1000);
+      }catch(e){ console.warn('download failed', e); }
+    }
+
+    adminSaveBtn?.addEventListener('click', ()=>{
+      if(!pendingMissions.length){ return; }
+      if(!pendingSettings) pendingSettings = { ...settings };
+      MISSIONS = cloneMissions(pendingMissions);
+      settings = { ...settings, ...pendingSettings };
+      saveLocalData(MISSIONS);
+      saveSettings();
+      applyTheme(settings.theme);
+      updateAnnouncement();
+      updateFooter();
+      renderHome();
+      closeAdmin();
+    });
+
+    adminClearBtn?.addEventListener('click', ()=>{
+      localStorage.removeItem('missions:data');
+      localStorage.removeItem('missions:meta');
+      meta.updatedAt = null;
+      MISSIONS = cloneMissions(DEFAULT_MISSIONS);
+      pendingMissions = cloneMissions(MISSIONS);
+      renderHome();
+      renderAdminSummary();
+      renderAdminMissions();
+    });
+
+    adminDownloadBtn?.addEventListener('click', downloadData);
+
+    adminAnnouncementInput?.addEventListener('input', (e)=>{
+      if(!pendingSettings) pendingSettings = { ...settings };
+      pendingSettings.announcement = e.target.value;
+      announceText.textContent = e.target.value;
+      if(e.target.value.trim()){ announceBar.classList.remove('hidden'); }
+      else { announceBar.classList.add('hidden'); }
+    });
+    adminIdleInput?.addEventListener('input', (e)=>{
+      if(!pendingSettings) pendingSettings = { ...settings };
+      const seconds = Math.max(10, parseInt(e.target.value,10) || 60);
+      pendingSettings.idleMs = seconds * 1000;
+      if(footerIdle){ footerIdle.textContent = seconds; }
+    });
+    adminHighlightInput?.addEventListener('input', (e)=>{
+      if(!pendingSettings) pendingSettings = { ...settings };
+      const seconds = Math.max(3, parseInt(e.target.value,10) || 8);
+      pendingSettings.highlightMs = seconds * 1000;
+    });
+    adminThemeSelect?.addEventListener('change', (e)=>{
+      if(!pendingSettings) pendingSettings = { ...settings };
+      pendingSettings.theme = e.target.value;
+      applyTheme(pendingSettings.theme);
+    });
+    adminAddMission?.addEventListener('click', ()=>{
+      if(!pendingMissions.length){ pendingMissions = cloneMissions(MISSIONS); }
+      pendingMissions.push({
+        id: `mission-${Date.now()}`,
+        title: 'New Mission',
+        subtitle: '',
+        focus: '',
+        involved: '',
+        contact: '',
+        body: '',
+        image: '',
+        links: []
+      });
+      renderAdminMissions();
+      renderAdminSummary();
+    });
+
+    pickMissionsDirBtn?.addEventListener('click', ()=> pickDirectory('missions'));
+    pickGeneralDirBtn?.addEventListener('click', ()=> pickDirectory('general'));
+    imageTargetSelect?.addEventListener('change', (e)=>{
+      if(imageTargetLabel){
+        imageTargetLabel.textContent = e.target.value === 'general' ? GENERAL_IMAGE_DIR : MISSION_IMAGE_DIR;
+      }
+      if(imageStatus){
+        const handle = e.target.value === 'general' ? generalDirHandle : missionsDirHandle;
+        imageStatus.textContent = handle ? `Ready to save into ${handle.name}.` : `Select a ${e.target.value} folder before uploading.`;
+      }
+    });
+    imageFileBrowse?.addEventListener('click', ()=> imageFileInput?.click());
+    imageFileInput?.addEventListener('change', (e)=>{
+      handleImageFiles(Array.from(e.target.files||[]));
+      e.target.value = '';
+    });
+    if(imageDrop){
+      ['dragenter','dragover'].forEach(evt=>imageDrop.addEventListener(evt, (e)=>{e.preventDefault(); imageDrop.classList.add('dragover');}));
+      ['dragleave','drop'].forEach(evt=>imageDrop.addEventListener(evt, (e)=>{e.preventDefault(); imageDrop.classList.remove('dragover');}));
+      imageDrop.addEventListener('drop', (e)=>{
+        handleImageFiles(Array.from(e.dataTransfer?.files||[]));
+      });
+      imageDrop.addEventListener('click', ()=> imageFileInput?.click());
+    }
+
+    async function init(){
+      loadMeta();
+      loadSettings();
+      applyTheme(settings.theme);
+      updateFooter();
+
+      // populate from sheet if provided
+      try {
+        const stored = loadLocalData();
+        if(stored){ MISSIONS = stored; }
+        else if(SHEET_CSV_URL){
+          const data = await fetchCSV(SHEET_CSV_URL);
+          if(Array.isArray(data) && data.length){MISSIONS = data;}
+        }
+      } catch(e){ console.warn('CSV load failed', e); }
+
+      updateAnnouncement();
+      pendingSettings = { ...settings };
+      renderHome();
+    }
+
+    // ---------- Minimal QR generator (no external deps) ----------
+    // For production-grade QR, drop a local qrcode.min.js next to this file and replace generateQR with that library.
+    function drawFallbackQR(text){
+      const ctx = qrCanvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0,0,300,300); ctx.fillStyle = '#000';
+      ctx.font = '16px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('Scan not available offline',150,135);
+      ctx.fillText(text,150,165);
+    }
+
+    function openQR(url){
+      try{ generateQR(url); }catch(e){ drawFallbackQR(url); }
+      qrModal.classList.remove('hidden');
+    }
+    function closeQR(){ qrModal.classList.add('hidden'); }
+
+    function generateQR(text){
+      // Placeholder draws fallback text. Replace with local QR library for scannable codes.
+      drawFallbackQR(text);
+    }
+
+    // Kickoff
+    init();
+  </script>
+</body>
+</html>
