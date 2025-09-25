@@ -1,6 +1,6 @@
 import { state, THEMES, DEFAULT_MISSIONS, MISSION_IMAGE_DIR, GENERAL_IMAGE_DIR, FS_SUPPORTED, ADMIN_PIN } from './data.js';
 import { dom } from './dom.js';
-import { clone, parseLinks } from './helpers.js';
+import { clone, parseLinks, serializeLinks } from './helpers.js';
 import { summaryCards, adminMissionRowTemplate } from './templates.js';
 import { getTotalViews, saveMissions, saveSettings } from './storage.js';
 import { renderHome, applyTheme, updateAnnouncement, updateFooter, updateSplash } from './render.js';
@@ -288,18 +288,64 @@ const renderAdminMissions = () => {
   renderAdminSummary();
 };
 
-const downloadData = () => {
+const csvEscape = (value) => {
+  const text = value == null ? '' : String(value);
+  const escaped = text.replace(/"/g, '""');
+  return `"${escaped}"`;
+};
+
+const missionsToCsv = (missions) => {
+  const header = ['id', 'title', 'subtitle', 'focus', 'involved', 'contact', 'body', 'image', 'links'];
+  const rows = missions.map((mission) => [
+    mission.id || '',
+    mission.title || '',
+    mission.subtitle || '',
+    mission.focus || '',
+    mission.involved || '',
+    mission.contact || '',
+    mission.body || '',
+    mission.image || '',
+    serializeLinks(mission.links || [])
+  ]);
+  return [header, ...rows]
+    .map((columns) => columns.map(csvEscape).join(','))
+    .join('\r\n');
+};
+
+const downloadData = async () => {
   try {
-    const payload = {
-      missions: state.missions,
-      settings: state.settings,
-      updatedAt: state.meta.updatedAt
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const missions = state.pendingMissions?.length ? state.pendingMissions : state.missions;
+    const csv = missionsToCsv(missions);
+    const suggestedName = `missions-export-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName,
+          types: [
+            {
+              description: 'CSV Files',
+              accept: { 'text/csv': ['.csv'] }
+            }
+          ]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(csv);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err?.name === 'AbortError') {
+          return;
+        }
+        console.warn('save picker failed, falling back to download', err);
+      }
+    }
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `missions-export-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.download = suggestedName;
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
