@@ -1,0 +1,14 @@
+# Ignore generated artifacts
+
+# Exclude images but keep folder structure via .gitkeep placeholders
+images/*
+!images/.gitkeep
+!images/general/
+!images/missions/
+images/general/*
+!images/general/.gitkeep
+images/missions/*
+!images/missions/.gitkeep
+
+# Ignore transient logs
+/tmp/
