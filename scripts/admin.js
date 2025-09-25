@@ -274,6 +274,9 @@ const closeAdminInternal = () => {
   applyTheme(state.settings.theme);
   updateAnnouncement();
   updateFooter();
+  dom.oskShowBtn?.classList.add('hidden');
+  document.body.classList.remove('osk-open');
+  document.dispatchEvent(new CustomEvent('osk:forceHide'));
 };
 
 const initAdminPanel = () => {

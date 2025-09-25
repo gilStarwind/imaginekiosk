@@ -67,5 +67,6 @@ export const dom = {
   imageFileBrowse: qs('#imageFileBrowse'),
   imageFileInput: qs('#imageFileInput'),
   footerIdle: qs('#footerIdle'),
-  qrBtn: qs('#qrBtn')
+  qrBtn: qs('#qrBtn'),
+  oskShowBtn: qs('#oskShowBtn')
 };

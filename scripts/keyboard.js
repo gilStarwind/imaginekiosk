@@ -3,7 +3,9 @@ import { dom } from './dom.js';
 const INPUT_SELECTOR = 'input[type="text"],input[type="password"],input[type="email"],input[type="number"],input[type="search"],textarea';
 
 let oskEl = null;
+let toggleBtn = null;
 let currentEl = null;
+let lastEl = null;
 let shift = false;
 let symbols = false;
 let minimized = false;
@@ -124,6 +126,7 @@ function showOSK(typeHint) {
   renderLayout(typeHint);
   oskEl.classList.remove('hidden');
   document.body.classList.add('osk-open');
+  toggleBtn?.classList.add('hidden');
 }
 
 function hideOSK() {
@@ -135,6 +138,13 @@ function hideOSK() {
   symbols = false;
   minimized = false;
   document.body.classList.remove('osk-open');
+  if (toggleBtn) {
+    if (dom.adminModal && !dom.adminModal.classList.contains('hidden')) {
+      toggleBtn.classList.remove('hidden');
+    } else {
+      toggleBtn.classList.add('hidden');
+    }
+  }
 }
 
 function insertText(txt) {
@@ -215,6 +225,8 @@ export function initKeyboard() {
       const t = ev.target;
       if (!eligible(t)) return;
       currentEl = t;
+      lastEl = t;
+      toggleBtn?.classList.add('hidden');
       const typeHint = (t.getAttribute('type') || '').toLowerCase();
       showOSK(typeHint);
     });
@@ -223,10 +235,26 @@ export function initKeyboard() {
       const closeTarget = ev.target && ev.target.dataset && ev.target.dataset.close;
       if (closeTarget === 'admin') hideOSK();
     });
+    document.addEventListener('osk:forceHide', hideOSK);
   };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup, { once: true });
   } else {
     setup();
+  }
+  toggleBtn = dom.oskShowBtn;
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      if (lastEl && document.contains(lastEl)) {
+        lastEl.focus();
+        return;
+      }
+      const fallback = dom.adminModal?.querySelector('input, textarea');
+      if (fallback) {
+        fallback.focus();
+      } else {
+        showOSK('text');
+      }
+    });
   }
 }
