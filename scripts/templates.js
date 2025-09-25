@@ -76,6 +76,17 @@ export const adminMissionRowTemplate = (mission, index) => {
           <input class="input-field" data-field="image" value="${escapeAttr(mission.image)}" />
         </label>
       </div>
+      <div class="flex items-center gap-3">
+        <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-emerald-800/50 bg-slate-800/50 flex items-center justify-center">
+          ${mission.image
+            ? html`<img data-role="thumb" alt="image preview" class="w-full h-full object-cover" src="${escapeAttr(mission.image)}"/>`
+            : html`<div data-role="thumb-empty" class="text-[10px] text-teal-200/60 px-1 text-center">No image</div>`}
+        </div>
+        <input type="file" accept="image/*" class="hidden" data-role="file" />
+        <button class="admin-icon-btn" data-action="choose-image">Choose Image</button>
+        <div class="text-xs text-teal-200/70" data-role="imgStatus"></div>
+      </div>
+      <div class="text-xs text-teal-200/60">Tip: you can also drag or paste an image anywhere onto this card to set it.</div>
       <label class="block space-y-1 text-xs uppercase tracking-wide text-teal-200/70">
         <span>Links (Label|URL; another|URL)</span>
         <textarea class="textarea-field" data-field="links">${escapeHTML(serializeLinks(mission.links))}</textarea>

@@ -92,6 +92,21 @@
       background: rgba(31,41,55,0.6);
       color: var(--on-surface);
     }
+    /* Drag highlight when dropping files onto a mission row */
+    .admin-card.dragover{ border-color: var(--brand); background: rgba(31,41,55,0.6); }
+    /* On-screen keyboard */
+    #osk{ background: rgba(2,6,23,0.9); border-top: 1px solid rgba(16,185,129,0.25); box-shadow: 0 -15px 30px rgba(0,0,0,0.35); }
+    #osk.osk--min .osk-wrap{ padding: 6px 12px; }
+    .osk-wrap{ max-width:1080px; margin:0 auto; padding: 8px 16px; }
+    .osk-row{ display:flex; gap:8px; justify-content:center; margin:6px 0; }
+    #osk.osk--min .osk-row{ display:none; }
+    .osk-key{ user-select:none; -webkit-user-select:none; padding:14px 12px; min-width:42px; border-radius:10px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: var(--on-surface); font-weight:700; font-size:20px; text-align:center; box-shadow: 0 6px 14px rgba(0,0,0,.2); }
+    .osk-key:active{ transform: scale(0.98); }
+    .osk-key--wide{ min-width: 84px; }
+    .osk-key--space{ flex:1; min-width: 140px; }
+    .osk-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; color: var(--text-muted); font-size: 12px; }
+    .osk-hide{ background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.12); padding: 6px 10px; border-radius: 999px; font-weight:600; }
+    body.osk-open #adminModal .admin-panel{ margin-bottom: 260px; }
     .display-title{ font-size: clamp(2.25rem, 4.5vw, 4.75rem); line-height: 1.1; }
     .display-lead{ font-size: clamp(1.125rem, 2.25vw, 1.85rem); line-height: 1.45; }
     .display-h2{ font-size: clamp(1.75rem, 3vw, 2.75rem); line-height: 1.15; }
@@ -315,19 +330,20 @@
   </footer>
 
   <!-- Admin Modal (hidden; opens via 5-tap on header title) -->
-  <div id="adminModal" class="fixed inset-0 hidden">
+  <div id="adminModal" class="fixed inset-x-0 top-[72px] bottom-0 hidden z-50">
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-close="admin"></div>
-    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:h-auto sm:w-[620px] rounded-t-3xl sm:rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-5 shadow-2xl shadow-emerald-950/40">
-      <div class="flex items-center justify-between">
-        <h4 class="text-xl font-bold">Admin</h4>
-        <button class="btn btn-secondary touch" data-close="admin">Close</button>
-      </div>
-      <div id="adminPinWrap" class="space-y-3">
-        <label class="block text-sm text-teal-200/80">Enter PIN</label>
-        <input id="adminPin" type="password" inputmode="numeric" class="input-field" placeholder="••••" />
-        <button id="adminPinBtn" class="btn btn-primary touch">Unlock</button>
-        <div id="adminPinMsg" class="text-sm text-red-300 hidden">Incorrect PIN</div>
-      </div>
+    <div class="relative h-full overflow-y-auto z-10">
+      <div class="admin-panel mx-auto my-6 w-full max-w-[620px] rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-5 shadow-2xl shadow-emerald-950/40">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xl font-bold">Admin</h4>
+          <button class="btn btn-secondary touch" data-close="admin">Close</button>
+        </div>
+        <div id="adminPinWrap" class="space-y-3">
+          <label class="block text-sm text-teal-200/80">Enter PIN</label>
+          <input id="adminPin" type="password" inputmode="numeric" class="input-field" placeholder="••••" />
+          <button id="adminPinBtn" class="btn btn-primary touch">Unlock</button>
+          <div id="adminPinMsg" class="text-sm text-red-300 hidden">Incorrect PIN</div>
+        </div>
       <div id="adminBody" class="hidden space-y-6 text-sm">
         <section id="adminSummary" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></section>
 
@@ -378,6 +394,26 @@
         </section>
 
         <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Kiosk Mode</h5>
+          <p class="text-teal-200/80 text-xs sm:text-sm">Run the kiosk via http://localhost on Raspberry Pi to enable direct image uploads and a smoother experience.</p>
+          <div class="flex flex-wrap gap-3">
+            <button id="adminKioskCheck" class="btn btn-secondary touch">Run Environment Check</button>
+            <button id="adminCopyStart" class="btn btn-secondary touch">Copy Start Command</button>
+            <button id="adminCopyServe" class="btn btn-secondary touch">Copy Serve Command</button>
+            <button id="adminOpenGuide" class="btn btn-secondary touch">Open Setup Guide</button>
+            <a href="README_KIOSK.md" target="_blank" class="btn btn-ghost touch">Open in New Tab</a>
+          </div>
+          <div id="adminKioskStatus" class="text-xs text-teal-200/70"></div>
+          <div class="admin-card space-y-2">
+            <div class="text-xs uppercase tracking-wide text-teal-200/70">Recommended</div>
+            <pre id="adminKioskCmd" class="whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40">./kiosk-start.sh 8080</pre>
+            <div class="text-xs uppercase tracking-wide text-teal-200/70">Alternative (serve only)</div>
+            <pre id="adminServeCmd" class="whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40">python3 serve.py --port 8080 --dir .</pre>
+            <div id="adminKioskGuide" class="hidden whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40 max-h-80 overflow-y-auto"></div>
+          </div>
+        </section>
+
+        <section class="space-y-3">
           <h5 class="text-base font-semibold text-teal-100/90">Display Settings</h5>
           <label class="block space-y-2">
             <span class="text-teal-200/80">Announcement message</span>
@@ -409,8 +445,11 @@
         </section>
       </div>
     </div>
+    </div>
   </div>
 
   <script type="module" src="scripts/main.js"></script>
+  <!-- On-screen keyboard container -->
+  <div id="osk" class="hidden fixed bottom-0 left-0 right-0 z-[60]"></div>
 </body>
 </html>

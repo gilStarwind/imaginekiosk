@@ -4,6 +4,7 @@ import { loadMissions, loadSettings, loadMeta } from './storage.js';
 import { applyTheme, updateFooter, updateAnnouncement, renderHome, startApp, gotoHome, back, resetIdle, triggerBounce, returnToIntro } from './render.js';
 import { initAdmin, openAdmin, closeAdmin } from './admin.js';
 import { initQR, closeQR } from './qr.js';
+import { initKeyboard } from './keyboard.js';
 import { fetchCsv } from './csv.js';
 import { clone } from './helpers.js';
 
@@ -85,6 +86,7 @@ const registerButtons = () => {
 const bootstrap = async () => {
   initQR();
   initAdmin();
+  initKeyboard();
   registerButtons();
   registerModalClosers();
   registerGestures();

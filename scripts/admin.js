@@ -87,6 +87,24 @@ const handleImageFiles = async (fileList) => {
   }
 };
 
+const saveMissionImage = async (file, index) => {
+  if (!FS_SUPPORTED) return { ok: false, message: 'Direct upload not supported in this browser.' };
+  if (!file) return { ok: false, message: 'No file selected.' };
+  const dirHandle = state.missionsDirHandle;
+  if (!dirHandle) {
+    return { ok: false, message: 'Choose a Missions folder first (in Image Library).' };
+  }
+  try {
+    await writeFileToDir(dirHandle, file);
+    const path = `${MISSION_IMAGE_DIR}${file.name}`;
+    state.pendingMissions[index].image = path;
+    return { ok: true, path };
+  } catch (err) {
+    console.warn('mission image save failed', err);
+    return { ok: false, message: err.message || 'Save failed' };
+  }
+};
+
 const renderAdminSummary = () => {
   if (!dom.adminSummary) return;
   const missions = state.pendingMissions.length ? state.pendingMissions : state.missions;
@@ -135,6 +153,95 @@ const renderAdminMissions = () => {
         renderAdminMissions();
         renderAdminSummary();
       });
+    });
+
+    // Per-mission image: choose + preview
+    const chooseBtn = row.querySelector('[data-action="choose-image"]');
+    const fileInput = row.querySelector('[data-role="file"]');
+    const statusEl = row.querySelector('[data-role="imgStatus"]');
+    const urlInput = row.querySelector('input[data-field="image"]');
+    let thumbImg = row.querySelector('[data-role="thumb"]');
+    const thumbEmpty = row.querySelector('[data-role="thumb-empty"]');
+
+    if (chooseBtn && fileInput) {
+      chooseBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (statusEl) statusEl.textContent = 'Saving image...';
+        const res = await saveMissionImage(file, index);
+        if (res.ok) {
+          if (urlInput) urlInput.value = res.path;
+          if (thumbEmpty) thumbEmpty.remove();
+          thumbImg = row.querySelector('[data-role="thumb"]');
+          if (thumbImg) {
+            thumbImg.src = res.path;
+          }
+          if (statusEl) statusEl.textContent = 'Saved.';
+        } else {
+          if (statusEl) statusEl.textContent = res.message;
+        }
+        e.target.value = '';
+      });
+    }
+
+    // Drag & drop onto the card
+    const onEnterOver = (ev) => { ev.preventDefault(); row.classList.add('dragover'); };
+    const onLeave = (ev) => { ev.preventDefault(); row.classList.remove('dragover'); };
+    const onDrop = async (ev) => {
+      ev.preventDefault();
+      row.classList.remove('dragover');
+      const file = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { if (statusEl) statusEl.textContent = 'Please drop an image file.'; return; }
+      if (statusEl) statusEl.textContent = 'Saving image...';
+      const res = await saveMissionImage(file, index);
+      if (res.ok) {
+        if (urlInput) urlInput.value = res.path;
+        if (thumbEmpty) thumbEmpty.remove();
+        thumbImg = row.querySelector('[data-role="thumb"]');
+        if (thumbImg) {
+          thumbImg.src = res.path;
+        }
+        if (statusEl) statusEl.textContent = 'Saved.';
+      } else {
+        if (statusEl) statusEl.textContent = res.message;
+      }
+    };
+    ['dragenter','dragover'].forEach((evt) => row.addEventListener(evt, onEnterOver));
+    ['dragleave','drop'].forEach((evt) => row.addEventListener(evt, onLeave));
+    row.addEventListener('drop', onDrop);
+
+    // Paste from clipboard (image)
+    row.addEventListener('paste', async (ev) => {
+      const cd = ev.clipboardData;
+      if (!cd) return;
+      let file = null;
+      if (cd.files && cd.files.length) {
+        file = cd.files[0];
+      } else if (cd.items && cd.items.length) {
+        for (const item of cd.items) {
+          if (item.kind === 'file' && item.type.startsWith('image/')) {
+            file = item.getAsFile();
+            break;
+          }
+        }
+      }
+      if (!file || !file.type?.startsWith('image/')) return;
+      ev.preventDefault();
+      if (statusEl) statusEl.textContent = 'Saving image...';
+      const res = await saveMissionImage(file, index);
+      if (res.ok) {
+        if (urlInput) urlInput.value = res.path;
+        if (thumbEmpty) thumbEmpty.remove();
+        thumbImg = row.querySelector('[data-role="thumb"]');
+        if (thumbImg) {
+          thumbImg.src = res.path;
+        }
+        if (statusEl) statusEl.textContent = 'Saved.';
+      } else {
+        if (statusEl) statusEl.textContent = res.message;
+      }
     });
   });
 
@@ -263,6 +370,74 @@ export const initAdmin = () => {
   });
 
   dom.adminDownloadBtn?.addEventListener('click', downloadData);
+
+  const updateKioskStatus = () => {
+    if (!dom.adminKioskStatus) return;
+    const proto = location.protocol;
+    const host = location.hostname || 'file';
+    const origin = proto === 'file:' ? 'file://' : location.origin;
+    const isLocalHost = ['localhost', '127.0.0.1', '::1', '[::1]'].includes(host);
+    const secure = window.isSecureContext;
+    const fs = FS_SUPPORTED;
+    const lines = [];
+    lines.push(`Serving from: ${origin}`);
+    lines.push(`Secure context: ${secure ? 'yes' : 'no'}`);
+    lines.push(`Localhost: ${isLocalHost ? 'yes' : 'no'}`);
+    lines.push(`File System Access API: ${fs ? 'available' : 'unavailable'}`);
+    if (proto === 'file:') {
+      lines.push('Tip: Start the kiosk on http://localhost for full features.');
+    }
+    if (!isLocalHost && proto.startsWith('http')) {
+      lines.push('Tip: Use http://localhost to enable local file access prompts.');
+    }
+    dom.adminKioskStatus.innerHTML = lines.map((l) => `<div>${l}</div>`).join('');
+  };
+
+  dom.adminKioskCheck?.addEventListener('click', updateKioskStatus);
+  // Run once when admin opens
+  updateKioskStatus();
+
+  const copyText = async (el) => {
+    const text = typeof el === 'string' ? el : (el?.textContent || '');
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      // Fallback: attempt selection
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(typeof el === 'string' ? document.body : el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('copy');
+        sel.removeAllRanges();
+      } catch (_) {}
+    }
+  };
+
+  dom.adminCopyStart?.addEventListener('click', () => copyText(dom.adminKioskCmd));
+  dom.adminCopyServe?.addEventListener('click', () => copyText(dom.adminServeCmd));
+
+  // Inline Setup Guide loader
+  dom.adminOpenGuide?.addEventListener('click', async () => {
+    if (!dom.adminKioskGuide) return;
+    // Toggle visibility if already loaded
+    if (dom.adminKioskGuide.dataset.loaded === 'true') {
+      dom.adminKioskGuide.classList.toggle('hidden');
+      return;
+    }
+    dom.adminKioskGuide.textContent = 'Loading setup guide...';
+    dom.adminKioskGuide.classList.remove('hidden');
+    try {
+      const resp = await fetch('README_KIOSK.md', { cache: 'no-store' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const text = await resp.text();
+      dom.adminKioskGuide.textContent = text;
+      dom.adminKioskGuide.dataset.loaded = 'true';
+    } catch (err) {
+      dom.adminKioskGuide.textContent = 'Could not load README_KIOSK.md. Use the "Open in New Tab" link above.';
+    }
+  });
 
   dom.adminAnnouncementInput?.addEventListener('input', (event) => {
     if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
