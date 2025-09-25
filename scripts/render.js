@@ -1,4 +1,4 @@
-import { state, THEMES, LOGO_URL } from './data.js';
+import { state, THEMES, LOGO_URL, PLACEHOLDER_IMAGE, GENERAL_IMAGE_DIR } from './data.js';
 import { dom } from './dom.js';
 import { missionCardTemplate } from './templates.js';
 import { html, escapeHTML, escapeAttr } from './helpers.js';
@@ -93,7 +93,10 @@ export function gotoDetail(id) {
   dom.dFocus.textContent = mission.focus || '—';
   dom.dInvolved.textContent = mission.involved || '—';
   dom.dBody.textContent = mission.body || '';
-  dom.dImage.src = mission.image || '';
+  if (dom.dImage) {
+    dom.dImage.onerror = () => { dom.dImage.src = PLACEHOLDER_IMAGE; };
+    dom.dImage.src = mission.image || PLACEHOLDER_IMAGE;
+  }
   triggerBounce(dom.dImage);
 
   dom.dContact.innerHTML = mission.contact
@@ -130,13 +133,21 @@ export function back() {
 
 export function renderHome() {
   if (dom.logoEl) {
-    dom.logoEl.src = LOGO_URL;
-    dom.logoEl.onerror = () => {
+    // Prefer PNG by default, then SVG, then text
+    const png = LOGO_URL; // images/general/logo.png
+    const svg = `${GENERAL_IMAGE_DIR}logo.svg`;
+    const toText = () => {
       const fallback = document.createElement('div');
       fallback.className = 'text-2xl font-black';
       fallback.textContent = 'Imagine Church';
       dom.logoEl.replaceWith(fallback);
     };
+    const toSvg = () => {
+      dom.logoEl.onerror = toText;
+      dom.logoEl.src = svg;
+    };
+    dom.logoEl.onerror = toSvg;
+    dom.logoEl.src = png;
   }
 
   if (dom.grid) {
@@ -147,6 +158,7 @@ export function renderHome() {
       dom.grid.querySelectorAll('button[data-id]').forEach((button) => {
         const { id } = button.dataset;
         const img = button.querySelector('.mission-visual');
+        if (img) img.onerror = () => { img.src = PLACEHOLDER_IMAGE; };
         button.onclick = () => gotoDetail(id);
         button.onpointerdown = () => triggerBounce(img || button);
       });
@@ -163,7 +175,10 @@ export function renderHome() {
     if (!mission) return;
     dom.hlTitle.textContent = mission.title || '';
     dom.hlBlurb.textContent = mission.subtitle || '';
-    dom.hlImage.src = mission.image || '';
+    if (dom.hlImage) {
+      dom.hlImage.onerror = () => { dom.hlImage.src = PLACEHOLDER_IMAGE; };
+      dom.hlImage.src = mission.image || PLACEHOLDER_IMAGE;
+    }
     dom.hlOpen.onclick = () => gotoDetail(mission.id);
   };
 

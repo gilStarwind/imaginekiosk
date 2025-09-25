@@ -127,6 +127,35 @@ const saveSplashImage = async (file) => {
   }
 };
 
+const refreshHomeLogo = () => {
+  // Re-render home to trigger logo reload logic
+  try { renderHome(); } catch (_) {}
+};
+
+const saveLogoFile = async (file) => {
+  if (!FS_SUPPORTED) return { ok: false, message: 'Direct upload not supported in this browser.' };
+  if (!file) return { ok: false, message: 'No file selected.' };
+  const dirHandle = state.generalDirHandle;
+  if (!dirHandle) {
+    return { ok: false, message: 'Choose a General images folder first (Image Library).' };
+  }
+  const isSvg = /svg/i.test(file.type) || /\.svg$/i.test(file.name);
+  const targetName = isSvg ? 'logo.svg' : 'logo.png';
+  try {
+    const permitted = await ensurePermission(dirHandle);
+    if (!permitted) throw new Error('Permission denied');
+    const targetHandle = await dirHandle.getFileHandle(targetName, { create: true });
+    const writable = await targetHandle.createWritable();
+    await writable.write(file);
+    await writable.close();
+    const path = `${GENERAL_IMAGE_DIR}${targetName}`;
+    return { ok: true, path };
+  } catch (err) {
+    console.warn('logo save failed', err);
+    return { ok: false, message: err.message || 'Save failed' };
+  }
+};
+
 const saveMissionImage = async (file, index) => {
   if (!FS_SUPPORTED) return { ok: false, message: 'Direct upload not supported in this browser.' };
   if (!file) return { ok: false, message: 'No file selected.' };
@@ -389,6 +418,19 @@ const initAdminPanel = () => {
   }
   updateSplashPreviewUI(state.pendingSettings.splashImage);
   previewSplash();
+
+  // Brand Logo preview (prefer PNG by default)
+  if (dom.adminLogoPreview) {
+    dom.adminLogoPreview.onerror = () => { dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.svg`; };
+    dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.png`;
+  }
+  if (dom.adminLogoStatus) {
+    dom.adminLogoStatus.textContent = FS_SUPPORTED
+      ? state.generalDirHandle
+        ? `Logos save into ${state.generalDirHandle.name} as logo.svg/png.`
+        : 'Choose a General images folder to enable uploads.'
+      : 'Direct upload not supported in this browser.';
+  }
 
   if (dom.adminThemeSelect) {
     dom.adminThemeSelect.innerHTML = Object.entries(THEMES)
@@ -660,6 +702,82 @@ export const initAdmin = () => {
       if (file) {
         ev.preventDefault();
         handleFile(file);
+      }
+    });
+  }
+
+  // Logo replace button
+  dom.adminLogoChoose?.addEventListener('click', () => dom.adminLogoFile?.click());
+  dom.adminLogoFile?.addEventListener('change', async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Saving logo...';
+    const res = await saveLogoFile(file);
+      if (res.ok) {
+      if (dom.adminLogoPreview) {
+        // Prefer PNG by default; if it's missing but SVG exists, onerror falls back
+        dom.adminLogoPreview.onerror = () => { dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.svg`; };
+        dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.png`;
+      }
+      if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Logo updated.';
+      refreshHomeLogo();
+    } else if (dom.adminLogoStatus) {
+      dom.adminLogoStatus.textContent = res.message;
+    }
+    event.target.value = '';
+  });
+
+  // Drag & drop / paste onto logo card
+  if (dom.adminLogoCard) {
+    const onEnterOver = (ev) => { ev.preventDefault(); dom.adminLogoCard.classList.add('dragover'); };
+    const onLeave = (ev) => { ev.preventDefault(); dom.adminLogoCard.classList.remove('dragover'); };
+    const onDrop = async (ev) => {
+      ev.preventDefault();
+      dom.adminLogoCard.classList.remove('dragover');
+      const file = ev.dataTransfer?.files?.[0];
+      if (!file) return;
+      if (!/image\/(svg\+xml|png)/.test(file.type) && !/\.(svg|png)$/i.test(file.name)) {
+        if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Please drop an SVG or PNG file.';
+        return;
+      }
+      if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Saving logo...';
+      const res = await saveLogoFile(file);
+      if (res.ok) {
+        if (dom.adminLogoPreview) {
+          dom.adminLogoPreview.onerror = () => { dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.svg`; };
+          dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.png`;
+        }
+        if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Logo updated.';
+        refreshHomeLogo();
+      } else if (dom.adminLogoStatus) {
+        dom.adminLogoStatus.textContent = res.message;
+      }
+    };
+    ['dragenter','dragover'].forEach((evt) => dom.adminLogoCard.addEventListener(evt, onEnterOver));
+    ['dragleave','drop'].forEach((evt) => dom.adminLogoCard.addEventListener(evt, onLeave));
+    dom.adminLogoCard.addEventListener('drop', onDrop);
+    dom.adminLogoCard.addEventListener('paste', async (ev) => {
+      const cd = ev.clipboardData;
+      if (!cd) return;
+      let file = null;
+      if (cd.files && cd.files.length) file = cd.files[0];
+      if (!file && cd.items && cd.items.length) {
+        for (const item of cd.items) {
+          if (item.kind === 'file') { file = item.getAsFile(); break; }
+        }
+      }
+      if (!file) return;
+      if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Saving logo...';
+      const res = await saveLogoFile(file);
+      if (res.ok) {
+        if (dom.adminLogoPreview) {
+          dom.adminLogoPreview.onerror = () => { dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.svg`; };
+          dom.adminLogoPreview.src = `${GENERAL_IMAGE_DIR}logo.png`;
+        }
+        if (dom.adminLogoStatus) dom.adminLogoStatus.textContent = 'Logo updated.';
+        refreshHomeLogo();
+      } else if (dom.adminLogoStatus) {
+        dom.adminLogoStatus.textContent = res.message;
       }
     });
   }

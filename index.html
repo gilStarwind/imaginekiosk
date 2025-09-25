@@ -319,7 +319,7 @@
               </div>
               <div class="pt-2 flex flex-wrap gap-3" id="dLinks"></div>
               <div class="pt-2">
-                <button id="qrBtn" class="btn btn-primary touch">Show QR to open on my phone</button>
+                <button id="qrBtn" class="btn btn-primary touch">Show me a QR Code</button>
               </div>
             </div>
           </div>
@@ -475,6 +475,21 @@
             </div>
             <div class="text-xs text-teal-200/60">Tip: drop or paste an image onto this card to upload it. Files save into your selected General images folder.</div>
           </div>
+        </section>
+
+        <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Brand Logo</h5>
+          <div id="adminLogoCard" class="admin-card flex items-center gap-3">
+            <div class="splash-preview">
+              <img id="adminLogoPreview" alt="Current logo" />
+            </div>
+            <div class="flex-1 flex items-center gap-2">
+              <input id="adminLogoFile" type="file" accept="image/svg+xml,image/png" class="hidden" />
+              <button id="adminLogoChoose" class="admin-icon-btn" title="Replace logo">Replace Logo</button>
+              <div id="adminLogoStatus" class="text-xs text-teal-200/70"></div>
+            </div>
+          </div>
+          <div class="text-xs text-teal-200/60">Tip: use an SVG for best clarity. You can also drag or paste a logo onto this card. Files save into your selected General images folder.</div>
         </section>
 
         <section class="space-y-3">

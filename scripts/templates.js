@@ -1,4 +1,5 @@
 import { html, escapeAttr, escapeHTML, serializeLinks, formatDate } from './helpers.js';
+import { PLACEHOLDER_IMAGE } from './data.js';
 import { getViewsFor } from './storage.js';
 
 export const missionCardTemplate = (mission) => {
@@ -11,7 +12,7 @@ export const missionCardTemplate = (mission) => {
           <div class="mt-2 t-subtle">${escapeHTML(mission.subtitle || '')}</div>
         </div>
         <div class="mission-chip shrink-0 w-24 h-24 rounded-2xl overflow-hidden border">
-          <img class="mission-visual w-full h-full object-cover" src="${escapeAttr(mission.image || '')}" alt="${escapeAttr(mission.title)}" />
+          <img class="mission-visual w-full h-full object-cover" src="${escapeAttr(mission.image || PLACEHOLDER_IMAGE)}" alt="${escapeAttr(mission.title)}" />
         </div>
       </div>
     </button>
