@@ -14,7 +14,13 @@
       setTimeout(function(){
         if(!getComputedStyle(probe).backgroundColor || getComputedStyle(probe).backgroundColor==='rgba(0, 0, 0, 0)'){
           var s=document.createElement('script');
-          s.src='https://cdn.tailwindcss.com';
+          // Use local tailwind.cdn.js when offline; CDN as a secondary fallback
+          s.src='tailwind.cdn.js';
+          s.onerror=function(){
+            var cdn=document.createElement('script');
+            cdn.src='https://cdn.tailwindcss.com';
+            document.head.appendChild(cdn);
+          };
           document.head.appendChild(s);
         }
         probe.remove();

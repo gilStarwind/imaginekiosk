@@ -62,3 +62,15 @@ Notes
 - Logs: Check /tmp/kiosk-server.log and /tmp/kiosk-chromium.log for troubleshooting.
 - Exit kiosk: Press Alt+F4 (or switch to TTY with Ctrl+Alt+F1).
 
+Offline CSS (Tailwind)
+- A minimal tailwind.min.css is included for offline use. For best results, replace it with a full Tailwind build when you have temporary network access:
+  cd ~/imagineKiosk
+  curl -L -o tailwind.min.css https://cdn.jsdelivr.net/npm/tailwindcss@3.4.10/dist/tailwind.min.css
+
+Local precompiled CSS (recommended)
+- Build on your dev machine (faster on Pi):
+  1) Ensure Node.js is installed locally (npx available)
+  2) From the project root:
+     ./scripts/build-tailwind.sh
+  3) Commit the generated tailwind.min.css and deploy to the Pi
+
