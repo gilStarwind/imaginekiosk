@@ -138,6 +138,11 @@
     }
     .admin-icon-btn:active{ transform: scale(0.95); }
     .admin-icon-btn--danger{ background:#f87171; color:#111; border-color:#fecaca; }
+    .intro-media{ width: clamp(12rem, 40vw, 18rem); height: clamp(12rem, 40vw, 18rem); border-radius: 1.75rem; overflow: hidden; border: 2px solid rgba(16,185,129,0.35); background: rgba(15,23,42,0.85); display:flex; align-items:center; justify-content:center; box-shadow: 0 20px 45px rgba(0,0,0,0.35); }
+    .intro-media img{ width:100%; height:100%; object-fit:cover; }
+    .intro-media.hidden{ display:none; }
+    .splash-preview{ width: 96px; height: 96px; border-radius: 1rem; overflow:hidden; border:1px solid rgba(16,185,129,0.4); background: rgba(15,23,42,0.6); display:flex; align-items:center; justify-content:center; }
+    .splash-preview img{ width:100%; height:100%; object-fit:cover; }
     @keyframes hero-pan {
       0%{ transform: scale(1.05) translateX(-1.5%); }
       50%{ transform: scale(1.08) translateX(1.5%); }
@@ -208,9 +213,12 @@
 </head>
 <body class="min-h-screen">
   <div id="introScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 text-center px-8">
+    <div class="intro-media hidden" id="introMedia">
+      <img id="introImage" alt="Welcome visual" />
+    </div>
     <div class="max-w-xl space-y-4">
-      <h1 class="display-title font-black tracking-tight">Welcome to Imagine Church</h1>
-      <p class="display-lead text-teal-100/90">Tap below to explore how Imagine Church is moving through missions and outreach.</p>
+      <h1 id="introTitle" class="display-title font-black tracking-tight">Welcome to Imagine Church</h1>
+      <p id="introSubtitle" class="display-lead text-teal-100/90">Tap below to explore how Imagine Church is moving through missions and outreach.</p>
     </div>
     <button id="startBtn" class="btn btn-primary touch transition-transform duration-200 focus:outline-none focus:ring-4 active:scale-95">
       Tap here to get Started
@@ -426,6 +434,40 @@
             <div class="text-xs uppercase tracking-wide text-teal-200/70">Alternative (serve only)</div>
             <pre id="adminServeCmd" class="whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40">python3 serve.py --port 8080 --dir .</pre>
             <div id="adminKioskGuide" class="hidden whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40 max-h-80 overflow-y-auto"></div>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Splash Screen</h5>
+          <p class="text-teal-200/80 text-xs sm:text-sm">Update the welcome screen title, subtitle, and optional image shown before launching the kiosk.</p>
+          <label class="block space-y-2">
+            <span class="text-teal-200/80">Headline</span>
+            <input id="adminSplashTitle" class="input-field" placeholder="Welcome headline" />
+          </label>
+          <label class="block space-y-2">
+            <span class="text-teal-200/80">Subtitle</span>
+            <textarea id="adminSplashSubtitle" class="textarea-field" rows="2" placeholder="Supporting message"></textarea>
+          </label>
+          <div class="admin-card space-y-3" id="adminSplashCard">
+            <div class="flex items-start gap-3">
+              <div class="splash-preview" id="adminSplashPreviewWrap">
+                <div id="adminSplashPreviewEmpty" class="text-[10px] text-teal-200/60 px-1 text-center">No image</div>
+                <img id="adminSplashPreview" class="hidden" alt="Splash preview" />
+              </div>
+              <div class="flex-1 space-y-2">
+                <label class="block text-xs uppercase tracking-wide text-teal-200/70">
+                  <span>Image path</span>
+                  <input id="adminSplashImage" class="input-field" placeholder="images/general/welcome.jpg" />
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  <input id="adminSplashFile" type="file" accept="image/*" class="hidden" />
+                  <button id="adminSplashChoose" class="btn btn-secondary touch">Choose Image</button>
+                  <button id="adminSplashClear" class="btn btn-secondary touch">Remove Image</button>
+                </div>
+                <div class="text-xs text-teal-200/70" id="adminSplashStatus"></div>
+              </div>
+            </div>
+            <div class="text-xs text-teal-200/60">Tip: drop or paste an image onto this card to upload it. Files save into your selected General images folder.</div>
           </div>
         </section>
 

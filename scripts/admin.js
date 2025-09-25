@@ -3,7 +3,7 @@ import { dom } from './dom.js';
 import { clone, parseLinks } from './helpers.js';
 import { summaryCards, adminMissionRowTemplate } from './templates.js';
 import { getTotalViews, saveMissions, saveSettings } from './storage.js';
-import { renderHome, applyTheme, updateAnnouncement, updateFooter } from './render.js';
+import { renderHome, applyTheme, updateAnnouncement, updateFooter, updateSplash } from './render.js';
 import { parseCsvText } from './csv.js';
 
 const setDirLabel = (label, handle) => {
@@ -84,6 +84,46 @@ const handleImageFiles = async (fileList) => {
   }
   if (dom.imageStatus) {
     dom.imageStatus.innerHTML = lines.join('<br/>') || 'No files processed.';
+  }
+};
+
+const updateSplashPreviewUI = (path) => {
+  if (!dom.adminSplashPreview) return;
+  if (path) {
+    dom.adminSplashPreview.src = path;
+    dom.adminSplashPreview.classList.remove('hidden');
+    dom.adminSplashPreviewEmpty?.classList.add('hidden');
+  } else {
+    dom.adminSplashPreview.classList.add('hidden');
+    dom.adminSplashPreview.removeAttribute('src');
+    dom.adminSplashPreviewEmpty?.classList.remove('hidden');
+  }
+};
+
+const previewSplash = () => {
+  const pending = state.pendingSettings || { ...state.settings };
+  updateSplash({ ...state.settings, ...pending });
+  updateSplashPreviewUI(pending.splashImage);
+};
+
+const saveSplashImage = async (file) => {
+  if (!FS_SUPPORTED) {
+    return { ok: false, message: 'Direct upload not supported. Enter an image path manually.' };
+  }
+  if (!file) return { ok: false, message: 'No file selected.' };
+  const dirHandle = state.generalDirHandle;
+  if (!dirHandle) {
+    return { ok: false, message: 'Choose a General images folder first (Image Library).' };
+  }
+  try {
+    await writeFileToDir(dirHandle, file);
+    const path = `${GENERAL_IMAGE_DIR}${file.name}`;
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.splashImage = path;
+    return { ok: true, path };
+  } catch (err) {
+    console.warn('splash image save failed', err);
+    return { ok: false, message: err.message || 'Save failed' };
   }
 };
 
@@ -274,6 +314,7 @@ const closeAdminInternal = () => {
   applyTheme(state.settings.theme);
   updateAnnouncement();
   updateFooter();
+  updateSplash();
   dom.oskShowBtn?.classList.add('hidden');
   document.body.classList.remove('osk-open');
   document.dispatchEvent(new CustomEvent('osk:forceHide'));
@@ -285,6 +326,23 @@ const initAdminPanel = () => {
   dom.adminAnnouncementInput.value = state.pendingSettings.announcement || '';
   dom.adminIdleInput.value = Math.round((state.pendingSettings.idleMs || 60000) / 1000);
   dom.adminHighlightInput.value = Math.round((state.pendingSettings.highlightMs || 8000) / 1000);
+  if (dom.adminSplashTitle) dom.adminSplashTitle.value = state.pendingSettings.splashTitle || '';
+  if (dom.adminSplashSubtitle) dom.adminSplashSubtitle.value = state.pendingSettings.splashSubtitle || '';
+  if (dom.adminSplashImage) dom.adminSplashImage.value = state.pendingSettings.splashImage || '';
+  if (dom.adminSplashStatus) {
+    dom.adminSplashStatus.textContent = FS_SUPPORTED
+      ? state.generalDirHandle
+        ? `Images save into ${state.generalDirHandle.name}.`
+        : 'Choose a General images folder to enable uploads.'
+      : 'Direct upload not supported in this browser; enter an image path manually.';
+  }
+  if (!FS_SUPPORTED) {
+    dom.adminSplashChoose?.setAttribute('disabled', 'true');
+  } else {
+    dom.adminSplashChoose?.removeAttribute('disabled');
+  }
+  updateSplashPreviewUI(state.pendingSettings.splashImage);
+  previewSplash();
 
   if (dom.adminThemeSelect) {
     dom.adminThemeSelect.innerHTML = Object.entries(THEMES)
@@ -327,6 +385,7 @@ const applyPendingChanges = () => {
   applyTheme(state.settings.theme);
   updateAnnouncement();
   updateFooter();
+  updateSplash();
   renderHome();
   closeAdminInternal();
 };
@@ -453,6 +512,112 @@ export const initAdmin = () => {
     }
   });
 
+  dom.adminSplashTitle?.addEventListener('input', (event) => {
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.splashTitle = event.target.value;
+    previewSplash();
+  });
+
+  dom.adminSplashSubtitle?.addEventListener('input', (event) => {
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.splashSubtitle = event.target.value;
+    previewSplash();
+  });
+
+  const handleManualSplashPath = (value) => {
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.splashImage = value.trim();
+    if (dom.adminSplashStatus) {
+      dom.adminSplashStatus.textContent = value.trim() ? `Using ${value.trim()}` : 'No image selected.';
+    }
+    updateSplashPreviewUI(value.trim());
+    previewSplash();
+  };
+
+  dom.adminSplashImage?.addEventListener('input', (event) => {
+    handleManualSplashPath(event.target.value);
+  });
+
+  dom.adminSplashChoose?.addEventListener('click', () => dom.adminSplashFile?.click());
+
+  dom.adminSplashClear?.addEventListener('click', () => {
+    if (dom.adminSplashImage) dom.adminSplashImage.value = '';
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.splashImage = '';
+    if (dom.adminSplashStatus) dom.adminSplashStatus.textContent = 'Image cleared.';
+    updateSplashPreviewUI('');
+    previewSplash();
+  });
+
+  dom.adminSplashFile?.addEventListener('change', async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (dom.adminSplashStatus) dom.adminSplashStatus.textContent = 'Saving image...';
+    const res = await saveSplashImage(file);
+    if (res.ok) {
+      if (dom.adminSplashImage) dom.adminSplashImage.value = res.path;
+      if (dom.adminSplashStatus) dom.adminSplashStatus.textContent = `Saved to ${res.path}`;
+      previewSplash();
+    } else if (dom.adminSplashStatus) {
+      dom.adminSplashStatus.textContent = res.message;
+    }
+    event.target.value = '';
+  });
+
+  if (dom.adminSplashCard) {
+    const enterOver = (ev) => {
+      ev.preventDefault();
+      dom.adminSplashCard.classList.add('dragover');
+    };
+    const leave = (ev) => {
+      ev.preventDefault();
+      dom.adminSplashCard.classList.remove('dragover');
+    };
+    const handleFile = async (file) => {
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        if (dom.adminSplashStatus) dom.adminSplashStatus.textContent = 'Please use an image file.';
+        return;
+      }
+      if (dom.adminSplashStatus) dom.adminSplashStatus.textContent = 'Saving image...';
+      const res = await saveSplashImage(file);
+      if (res.ok) {
+        if (dom.adminSplashImage) dom.adminSplashImage.value = res.path;
+        if (dom.adminSplashStatus) dom.adminSplashStatus.textContent = `Saved to ${res.path}`;
+        previewSplash();
+      } else if (dom.adminSplashStatus) {
+        dom.adminSplashStatus.textContent = res.message;
+      }
+    };
+    ['dragenter', 'dragover'].forEach((evt) => dom.adminSplashCard.addEventListener(evt, enterOver));
+    ['dragleave', 'drop'].forEach((evt) => dom.adminSplashCard.addEventListener(evt, leave));
+    dom.adminSplashCard.addEventListener('drop', (ev) => {
+      ev.preventDefault();
+      dom.adminSplashCard.classList.remove('dragover');
+      const file = ev.dataTransfer?.files?.[0];
+      handleFile(file);
+    });
+    dom.adminSplashCard.addEventListener('paste', (ev) => {
+      const cd = ev.clipboardData;
+      if (!cd) return;
+      let file = null;
+      if (cd.files && cd.files.length) {
+        file = cd.files[0];
+      } else if (cd.items && cd.items.length) {
+        for (const item of cd.items) {
+          if (item.kind === 'file' && item.type.startsWith('image/')) {
+            file = item.getAsFile();
+            break;
+          }
+        }
+      }
+      if (file) {
+        ev.preventDefault();
+        handleFile(file);
+      }
+    });
+  }
+
   dom.adminIdleInput?.addEventListener('input', (event) => {
     if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
     const seconds = Math.max(10, parseInt(event.target.value, 10) || 60);
@@ -515,6 +680,9 @@ export const initAdmin = () => {
       if (dom.imageStatus) {
         dom.imageStatus.classList.remove('text-red-300');
         dom.imageStatus.textContent = `Ready to save into ${handle.name}.`;
+      }
+      if (dom.adminSplashStatus) {
+        dom.adminSplashStatus.textContent = `Images save into ${handle.name}.`;
       }
     } catch (err) {
       console.warn('Directory pick cancelled', err);

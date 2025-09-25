@@ -31,6 +31,31 @@ export function updateAnnouncement() {
   }
 }
 
+export function updateSplash(custom) {
+  const settings = custom || state.settings;
+  if (dom.introTitle) {
+    dom.introTitle.textContent = settings.splashTitle || 'Welcome to Imagine Church';
+  }
+  if (dom.introSubtitle) {
+    dom.introSubtitle.textContent = settings.splashSubtitle || 'Tap below to explore how Imagine Church is moving through missions and outreach.';
+  }
+  if (dom.introImage && dom.introMedia) {
+    const src = (settings.splashImage || '').trim();
+    if (src) {
+      dom.introImage.onload = () => dom.introMedia.classList.remove('hidden');
+      dom.introImage.onerror = () => {
+        dom.introMedia.classList.add('hidden');
+        dom.introImage.removeAttribute('src');
+      };
+      dom.introImage.src = src;
+      dom.introMedia.classList.remove('hidden');
+    } else {
+      dom.introMedia.classList.add('hidden');
+      dom.introImage.removeAttribute('src');
+    }
+  }
+}
+
 export function triggerBounce(element) {
   if (!element) return;
   element.classList.remove('bounce-once');

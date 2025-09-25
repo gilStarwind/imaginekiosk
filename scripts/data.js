@@ -64,7 +64,10 @@ export const DEFAULT_SETTINGS = {
   announcement: '',
   idleMs: 60000,
   highlightMs: 8000,
-  theme: 'evergreen'
+  theme: 'evergreen',
+  splashTitle: 'Welcome to Imagine Church',
+  splashSubtitle: 'Tap below to explore how Imagine Church is moving through missions and outreach.',
+  splashImage: ''
 };
 
 export const DEFAULT_META = {

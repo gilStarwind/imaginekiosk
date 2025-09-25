@@ -1,7 +1,7 @@
 import { state, DEFAULT_MISSIONS, THEMES, SHEET_CSV_URL } from './data.js';
 import { dom } from './dom.js';
 import { loadMissions, loadSettings, loadMeta } from './storage.js';
-import { applyTheme, updateFooter, updateAnnouncement, renderHome, startApp, gotoHome, back, resetIdle, triggerBounce, returnToIntro } from './render.js';
+import { applyTheme, updateFooter, updateAnnouncement, updateSplash, renderHome, startApp, gotoHome, back, resetIdle, triggerBounce, returnToIntro } from './render.js';
 import { initAdmin, openAdmin, closeAdmin } from './admin.js';
 import { initQR, closeQR } from './qr.js';
 import { initKeyboard } from './keyboard.js';
@@ -33,6 +33,7 @@ const hydrateState = async () => {
   }
 
   updateAnnouncement();
+  updateSplash();
   state.pendingSettings = { ...state.settings };
 };
 
