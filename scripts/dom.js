@@ -51,6 +51,7 @@ export const dom = {
   adminAddMission: qs('#adminAddMission'),
   adminKioskCheck: qs('#adminKioskCheck'),
   adminKioskStatus: qs('#adminKioskStatus'),
+  adminExitBtn: qs('#adminExitBtn'),
   adminCopyStart: qs('#adminCopyStart'),
   adminCopyServe: qs('#adminCopyServe'),
   adminKioskCmd: qs('#adminKioskCmd'),

@@ -569,6 +569,20 @@ export const initAdmin = () => {
   dom.adminCopyStart?.addEventListener('click', () => copyText(dom.adminKioskCmd));
   dom.adminCopyServe?.addEventListener('click', () => copyText(dom.adminServeCmd));
 
+  // Exit kiosk (closes Chromium and server)
+  dom.adminExitBtn?.addEventListener('click', async () => {
+    if (!confirm('Exit kiosk now? This will close the browser window.')) return;
+    try {
+      const resp = await fetch('/__exit', { method: 'POST' });
+      if (!resp.ok) throw new Error('Request failed');
+    } catch (err) {
+      // If request fails, show a hint
+      if (dom.adminKioskStatus) {
+        dom.adminKioskStatus.innerHTML = '<span class="text-red-300">Exit failed. Use Alt+F4 or pkill chromium-browser.</span>';
+      }
+    }
+  });
+
   // Inline Setup Guide loader
   dom.adminOpenGuide?.addEventListener('click', async () => {
     if (!dom.adminKioskGuide) return;
