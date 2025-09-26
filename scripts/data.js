@@ -204,7 +204,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Scripture in the heart language transforms lives and communities.',
     image: './images/missions/wycliffe.svg',
-    links: []
+    links: [{ label: 'https://www.wycliffe.org', href: '#' }]
   },
   {
     id: 'clover-area-assistance-center',
@@ -215,7 +215,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Compassionate care that meets needs with dignity and respect.',
     image: './images/missions/cloverarea-logo.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://cloverareaassistance.org' }]
   }
 ];
 
