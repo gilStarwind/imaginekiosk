@@ -86,7 +86,9 @@ export const DEFAULT_SETTINGS = {
   theme: 'evergreen',
   splashTitle: 'Welcome to Imagine Church',
   splashSubtitle: 'Tap below to explore how Imagine Church is moving through missions and outreach.',
-  splashImage: ''
+  splashImage: '',
+  // Domains that should not be opened in the in-app iframe (suffix match)
+  webBlocklist: ['wycliffe.org', 'facebook.com', 'rideabilitysc.com']
 };
 
 export const DEFAULT_META = {
@@ -105,7 +107,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Add a short paragraph with story, impact, or goals so guests understand why this matters.',
     image: '/images/missions/givehope_color.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://www.givehopeglobal.org' }]
   },
   {
     id: 'rideability-therapeutic-riding-center',
@@ -116,7 +118,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Share how riding builds strength, confidence, and connection for participants and families.',
     image: '/images/missions/rideability.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://www.rideabilitysc.com' }]
   },
   {
     id: 'kairos-prison-ministry',
@@ -127,7 +129,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Kairos changes lives through community, compassion, and consistent presence.',
     image: '/images/missions/kairos.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://www.kairoslegacy.org' }]
   },
   {
     id: 'community-bible-study',
@@ -138,7 +140,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Life transformation happens as we gather, read, and respond to God’s Word.',
     image: '/images/missions/community_bible_study.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://www.communitybiblestudy.org' }]
   },
   {
     id: 'palmetto-womens-center',
@@ -149,7 +151,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Compassionate, confidential help at crucial moments.',
     image: '/images/missions/palmetto_womens.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://www.palmettowomenscenter.com' }]
   },
   {
     id: 'tender-hearts-ministries',
@@ -160,7 +162,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Meeting immediate needs can open doors to lasting change.',
     image: '/images/missions/tender_hearts.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://tenderheartssc.org' }]
   },
   {
     id: 'philippine-hope',
@@ -170,8 +172,8 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Pray, sponsor a project, or join a future trip.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Sharing Christ’s love through service, presence, and partnership.',
-    image: '/images/missions/givehope_color.png',
-    links: []
+    image: '/images/missions/phphope.png',
+    links: [{ label: 'Visit Website', href: 'https://www.facebook.com/hopephilippinesofficial/' }]
   },
   {
     id: 'kinard-elementary-school',
@@ -182,7 +184,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Investing in local schools strengthens families and our community.',
     image: '/images/missions/kinard.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://younglife.org' }]
   },
   {
     id: 'young-life-of-western-york-county',
@@ -193,7 +195,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Caring adults earn the right to be heard and point teens to Jesus.',
     image: '/images/missions/younglife.png',
-    links: []
+    links: [{ label: 'Visit Website', href: 'https://younglife.org' }]
   },
   {
     id: 'wycliffe-bible-translators-se-asia',
@@ -204,7 +206,7 @@ export const DEFAULT_MISSIONS = [
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Scripture in the heart language transforms lives and communities.',
     image: './images/missions/wycliffe.svg',
-    links: [{ label: 'https://www.wycliffe.org', href: '#' }]
+    links: [{ label: 'Visit Website', href: 'https://www.wycliffe.org' }]
   },
   {
     id: 'clover-area-assistance-center',

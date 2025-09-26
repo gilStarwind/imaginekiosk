@@ -362,8 +362,13 @@
       <div class="relative h-[65vh] sm:h-[calc(80vh-60px)] bg-white">
         <iframe id="webFrame" class="w-full h-full" style="background:#fff;" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-downloads"></iframe>
         <div id="webError" class="hidden absolute inset-0 flex items-center justify-center text-center px-6">
-          <div class="rounded-xl border border-emerald-800/50 bg-slate-950/85 px-4 py-3 text-teal-100/90 text-sm">
-            Unfortunately this site is Unavailable in this Mode
+          <div class="rounded-xl border border-emerald-800/50 bg-slate-950/85 px-4 py-4 text-teal-100/90 text-sm space-y-3 max-w-lg">
+            <div>Unfortunately this site is Unavailable in this Mode</div>
+            <div class="text-teal-200/70 break-all" id="webErrorUrl"></div>
+            <div class="flex items-center justify-center gap-2">
+              <button id="webCopyBtn" class="btn btn-secondary touch">Copy Link</button>
+              <button id="webQrBtn" class="btn btn-primary touch">Show QR</button>
+            </div>
           </div>
         </div>
       </div>
@@ -466,6 +471,15 @@
             <pre id="adminServeCmd" class="whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40">python3 serve.py --port 8080 --dir .</pre>
             <div id="adminKioskGuide" class="hidden whitespace-pre-wrap text-teal-100/90 text-xs bg-slate-800/50 p-3 rounded-lg border border-emerald-800/40 max-h-80 overflow-y-auto"></div>
           </div>
+        </section>
+
+        <section class="space-y-3">
+          <h5 class="text-base font-semibold text-teal-100/90">Web Embeds</h5>
+          <p class="text-teal-200/80 text-xs sm:text-sm">Block domains from opening inside the kiosk (one per line). Useful for sites that disable embedding or show poorly inside the iframe. Applies after saving.</p>
+          <label class="block space-y-2">
+            <span class="text-teal-200/80">Blocked domains</span>
+            <textarea id="adminWebBlocklist" class="textarea-field" rows="4" placeholder="e.g.\nwycliffe.org\nfacebook.com"></textarea>
+          </label>
         </section>
 
         <section class="space-y-3">

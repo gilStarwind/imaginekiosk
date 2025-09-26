@@ -404,6 +404,7 @@ const initAdminPanel = () => {
   if (dom.adminSplashTitle) dom.adminSplashTitle.value = state.pendingSettings.splashTitle || '';
   if (dom.adminSplashSubtitle) dom.adminSplashSubtitle.value = state.pendingSettings.splashSubtitle || '';
   if (dom.adminSplashImage) dom.adminSplashImage.value = state.pendingSettings.splashImage || '';
+  if (dom.adminWebBlocklist) dom.adminWebBlocklist.value = (state.pendingSettings.webBlocklist || []).join('\n');
   if (dom.adminSplashStatus) {
     dom.adminSplashStatus.textContent = FS_SUPPORTED
       ? state.generalDirHandle
@@ -799,6 +800,16 @@ export const initAdmin = () => {
     if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
     state.pendingSettings.theme = event.target.value;
     applyTheme(state.pendingSettings.theme);
+  });
+
+  // Web embed blocklist (applies after saving)
+  dom.adminWebBlocklist?.addEventListener('input', (event) => {
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    const lines = String(event.target.value || '')
+      .split(/\r?\n/)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    state.pendingSettings.webBlocklist = Array.from(new Set(lines));
   });
 
   dom.adminAddMission?.addEventListener('click', () => {

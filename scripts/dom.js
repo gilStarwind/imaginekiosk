@@ -56,6 +56,7 @@ export const dom = {
   adminServeCmd: qs('#adminServeCmd'),
   adminOpenGuide: qs('#adminOpenGuide'),
   adminKioskGuide: qs('#adminKioskGuide'),
+  adminWebBlocklist: qs('#adminWebBlocklist'),
   adminSplashTitle: qs('#adminSplashTitle'),
   adminSplashSubtitle: qs('#adminSplashSubtitle'),
   adminSplashImage: qs('#adminSplashImage'),
@@ -92,5 +93,8 @@ export const dom = {
   // Web modal
   webModal: qs('#webModal'),
   webFrame: qs('#webFrame'),
-  webError: qs('#webError')
+  webError: qs('#webError'),
+  webErrorUrl: qs('#webErrorUrl'),
+  webCopyBtn: qs('#webCopyBtn'),
+  webQrBtn: qs('#webQrBtn')
 };
