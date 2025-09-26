@@ -104,7 +104,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Pray, give, or serve. Ask about upcoming needs and events.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Add a short paragraph with story, impact, or goals so guests understand why this matters.',
-    image: '',
+    image: '/images/missions/givehope_color.png',
     links: []
   },
   {
@@ -115,7 +115,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Volunteer at sessions, help with care, or provide resources.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Share how riding builds strength, confidence, and connection for participants and families.',
-    image: '',
+    image: '/images/missions/rideability.png',
     links: []
   },
   {
@@ -126,7 +126,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Pray, write encouragement, serve meals, or support weekend retreats.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Kairos changes lives through community, compassion, and consistent presence.',
-    image: '',
+    image: '/images/missions/kairos.png',
     links: []
   },
   {
@@ -137,7 +137,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Join a study, invite a friend, or serve as a leader.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Life transformation happens as we gather, read, and respond to God’s Word.',
-    image: '',
+    image: '/images/missions/community_bible_study.png',
     links: []
   },
   {
@@ -148,7 +148,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Donate supplies, volunteer your skills, or become a prayer partner.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Compassionate, confidential help at crucial moments.',
-    image: '',
+    image: '/images/missions/palmetto_womens.png',
     links: []
   },
   {
@@ -159,7 +159,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Give goods, serve on-site, or support programs financially.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Meeting immediate needs can open doors to lasting change.',
-    image: '',
+    image: '/images/missions/tender_hearts.png',
     links: []
   },
   {
@@ -170,7 +170,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Pray, sponsor a project, or join a future trip.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Sharing Christ’s love through service, presence, and partnership.',
-    image: '',
+    image: '/images/missions/givehope_color.png',
     links: []
   },
   {
@@ -181,7 +181,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Provide school supplies, mentorship, or staff appreciation help.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Investing in local schools strengthens families and our community.',
-    image: '',
+    image: '/images/missions/kinard.png',
     links: []
   },
   {
@@ -192,7 +192,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Become a leader, provide meals, or sponsor camp scholarships.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Caring adults earn the right to be heard and point teens to Jesus.',
-    image: '',
+    image: '/images/missions/younglife.png',
     links: []
   },
   {
@@ -203,7 +203,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Pray for teams, give to translation projects, share updates.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Scripture in the heart language transforms lives and communities.',
-    image: '',
+    image: './images/missions/wycliffe.svg',
     links: []
   },
   {
@@ -214,7 +214,7 @@ export const DEFAULT_MISSIONS = [
     involved: 'How to Get Involved: Serve at the pantry, donate goods, or assist with client care.',
     contact: 'missions@imaginechurchnow.com',
     body: 'About this Mission: Compassionate care that meets needs with dignity and respect.',
-    image: '',
+    image: './images/missions/cloverarea-logo.png',
     links: []
   }
 ];
