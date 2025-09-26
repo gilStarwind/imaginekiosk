@@ -76,6 +76,38 @@ export const THEMES = {
       '--text-muted': '#fcd2b8',
       '--text-subtle': '#fdba74'
     }
+  },
+  sunrise: {
+    label: 'Sunrise',
+    gradient: 'linear-gradient(180deg,#ff8a66 0%,#ff5858 50%,#9d32ff 100%)',
+    vars: {
+      '--brand': '#ff9a5f',
+      '--brand-700': '#ff6f61',
+      '--brand-900': '#b03c79',
+      '--on-brand': '#1a0b1f',
+      '--surface': '#1d1022',
+      '--surface-2': '#25152b',
+      '--on-surface': '#ffe4f4',
+      '--text-base': '#ffe9f7',
+      '--text-muted': '#ffc7d5',
+      '--text-subtle': '#ffd7ea'
+    }
+  },
+  lagoon: {
+    label: 'Lagoon',
+    gradient: 'linear-gradient(180deg,#00c9ff 0%,#92fe9d 100%)',
+    vars: {
+      '--brand': '#41d1ff',
+      '--brand-700': '#00b4d8',
+      '--brand-900': '#0077b6',
+      '--on-brand': '#04253a',
+      '--surface': '#003049',
+      '--surface-2': '#022b43',
+      '--on-surface': '#d6f5ff',
+      '--text-base': '#dff6ff',
+      '--text-muted': '#a6e3ff',
+      '--text-subtle': '#b2ffd6'
+    }
   }
 };
 
