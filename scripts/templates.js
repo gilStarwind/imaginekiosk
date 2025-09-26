@@ -4,14 +4,14 @@ import { getViewsFor } from './storage.js';
 
 export const missionCardTemplate = (mission) => {
   return html`
-    <button class="mission-card group touch text-left p-5 rounded-3xl border transition-transform active:scale-[0.99]" data-id="${escapeAttr(mission.id)}">
+    <button class="mission-card group touch text-left p-6 rounded-3xl border transition-transform active:scale-[0.99]" data-id="${escapeAttr(mission.id)}">
       <div class="flex items-start gap-3">
         <div class="grow">
           <div class="text-xs uppercase tracking-wider t-muted">Mission</div>
-          <div class="mt-1 text-2xl font-bold">${escapeHTML(mission.title)}</div>
-          <div class="mt-2 t-subtle">${escapeHTML(mission.subtitle || '')}</div>
+          <div class="mt-2 mission-card-title font-bold">${escapeHTML(mission.title)}</div>
+          <div class="mt-3 t-subtle mission-card-subtitle">${escapeHTML(mission.subtitle || '')}</div>
         </div>
-        <div class="mission-chip shrink-0 w-24 h-24 rounded-2xl overflow-hidden border">
+        <div class="mission-chip shrink-0 rounded-2xl overflow-hidden border">
           <img class="mission-visual w-full h-full object-cover" src="${escapeAttr(mission.image || PLACEHOLDER_IMAGE)}" alt="${escapeAttr(mission.title)}" />
         </div>
       </div>
