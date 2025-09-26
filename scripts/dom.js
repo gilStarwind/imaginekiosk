@@ -31,6 +31,7 @@ export const dom = {
   announceText: qs('#announceText'),
   qrModal: qs('#qrModal'),
   qrCanvas: qs('#qrCanvas'),
+  qrCanvasWrap: qs('#qrCanvasWrap'),
   adminModal: qs('#adminModal'),
   adminPinWrap: qs('#adminPinWrap'),
   adminBody: qs('#adminBody'),

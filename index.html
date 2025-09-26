@@ -27,6 +27,8 @@
       },0);
     })();
   </script>
+  <!-- Local QR generator for offline use -->
+  <script src="scripts/vendor/qrcode.min.js"></script>
   <style>
     :root{
       /* Theme variables (overridden by selected preset) */
@@ -335,18 +337,17 @@
   </main>
 
   <!-- QR Modal -->
-  <div id="qrModal" class="fixed inset-0 hidden">
+  <div id="qrModal" class="fixed inset-0 hidden z-[70] flex items-center justify-center">
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-close="qr"></div>
-    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:h-auto sm:w-[480px] rounded-t-3xl sm:rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-4 shadow-2xl shadow-emerald-950/40">
-      <div class="flex items-center justify-between">
-        <h4 class="text-xl font-bold">Scan to open on your phone</h4>
-        <button class="btn btn-secondary touch" data-close="qr">Close</button>
+    <div class="relative w-[320px] max-w-[90vw] rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-3 shadow-2xl shadow-emerald-950/40">
+      <button class="admin-icon-btn absolute right-3 top-3" data-close="qr" aria-label="Close">✕</button>
+      <div class="flex items-center justify-center py-2">
+        <h4 class="text-base font-bold">Scan to open</h4>
       </div>
-      <div class="flex flex-col items-center gap-3">
-        <div id="qrCanvasWrap" class="rounded-2xl bg-white p-3 shadow-lg shadow-emerald-950/20">
-          <canvas id="qrCanvas" width="300" height="300"></canvas>
+      <div class="flex items-center justify-center">
+        <div id="qrCanvasWrap" class="rounded-2xl bg-white p-2 shadow-lg shadow-emerald-950/20">
+          <canvas id="qrCanvas" width="240" height="240"></canvas>
         </div>
-        <div class="text-teal-100/80 text-sm">Point your camera at the code</div>
       </div>
     </div>
   </div>

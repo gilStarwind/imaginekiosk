@@ -82,7 +82,7 @@ export const THEMES = {
 export const DEFAULT_SETTINGS = {
   announcement: '',
   idleMs: 60000,
-  highlightMs: 8000,
+  highlightMs: 10000,
   theme: 'evergreen',
   splashTitle: 'Welcome to Imagine Church',
   splashSubtitle: 'Tap below to explore how Imagine Church is moving through missions and outreach.',
