@@ -104,7 +104,7 @@ export function gotoDetail(id) {
     : '—';
 
   dom.dLinks.innerHTML = html`${(mission.links || []).map(
-    (link) => html`<a class="btn btn-primary touch inline-flex items-center justify-center" target="_blank" rel="noopener" href="${escapeAttr(link.href)}">${escapeHTML(link.label)}</a>`
+    (link) => html`<a class="btn btn-primary touch inline-flex items-center justify-center" data-openweb="${escapeAttr(link.href)}" href="#">${escapeHTML(link.label)}</a>`
   )}`;
 
   const viewCount = incrementViewsFor(mission.id);

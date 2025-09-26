@@ -4,6 +4,7 @@ import { loadMissions, loadSettings, loadMeta } from './storage.js';
 import { applyTheme, updateFooter, updateAnnouncement, updateSplash, renderHome, startApp, gotoHome, back, resetIdle, triggerBounce, returnToIntro } from './render.js';
 import { initAdmin, openAdmin, closeAdmin } from './admin.js';
 import { initQR, closeQR } from './qr.js';
+import { initWeb, closeWeb, openWeb } from './webview.js';
 import { initKeyboard } from './keyboard.js';
 import { fetchCsv } from './csv.js';
 import { clone } from './helpers.js';
@@ -71,6 +72,9 @@ const registerModalClosers = () => {
     if (closeTarget === 'admin') {
       closeAdmin();
     }
+    if (closeTarget === 'web') {
+      closeWeb();
+    }
   });
 };
 
@@ -86,6 +90,7 @@ const registerButtons = () => {
 
 const bootstrap = async () => {
   initQR();
+  initWeb();
   initAdmin();
   initKeyboard();
   registerButtons();
@@ -93,6 +98,14 @@ const bootstrap = async () => {
   registerGestures();
   registerIdleReset();
   dom.dImage?.addEventListener('pointerdown', () => triggerBounce(dom.dImage));
+  // Delegate clicks for in-app web links
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[data-openweb]');
+    if (a && a.dataset.openweb) {
+      e.preventDefault();
+      openWeb(a.dataset.openweb);
+    }
+  });
 
   await hydrateState();
   renderHome();

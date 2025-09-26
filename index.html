@@ -351,6 +351,26 @@
     </div>
   </div>
 
+  <!-- Web Modal (in-app browser) -->
+  <div id="webModal" class="fixed inset-0 hidden">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-close="web"></div>
+    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:h-[80vh] sm:w-[900px] rounded-t-3xl sm:rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-0 shadow-2xl shadow-emerald-950/40 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-emerald-900/60">
+        <h4 class="text-base md:text-lg font-bold">In-App View</h4>
+        <button class="btn btn-secondary touch" data-close="web">Close</button>
+      </div>
+      <div class="relative h-[65vh] sm:h-[calc(80vh-60px)] bg-white">
+        <iframe id="webFrame" class="w-full h-full" style="background:#fff;" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-downloads"></iframe>
+        <div id="webError" class="hidden absolute inset-0 flex items-center justify-center text-center px-6">
+          <div class="rounded-xl border border-emerald-800/50 bg-slate-950/85 px-4 py-3 text-teal-100/90 text-sm">
+            Unfortunately this site is Unavailable in this Mode
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-2 text-xs text-teal-200/70 border-t border-emerald-900/60">Tap Close to return.</div>
+    </div>
+  </div>
+
   <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/85 border-t border-emerald-900/60">
     <div class="portrait-wrap px-5 py-2 flex items-center justify-between text-teal-200/70 text-sm gap-4">
       <span id="footerTip" class="flex-1">Tap Back or Home anytime • Idle reset after <span id="footerIdle">60</span>s</span>

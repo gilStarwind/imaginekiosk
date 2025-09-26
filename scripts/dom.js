@@ -88,4 +88,9 @@ export const dom = {
   introImage: qs('#introImage'),
   introMedia: qs('#introMedia'),
   oskShowBtn: qs('#oskShowBtn')
+  ,
+  // Web modal
+  webModal: qs('#webModal'),
+  webFrame: qs('#webFrame'),
+  webError: qs('#webError')
 };
