@@ -44,7 +44,24 @@
       --text-subtle:#a7f3d0;
       --bg-gradient:linear-gradient(180deg,#022c22 0%,#02131b 55%,#031c28 100%);
     }
-    body{background:var(--bg-gradient);color:var(--text-base);}
+    html, body{
+      background:var(--bg-gradient);
+      color:var(--text-base);
+    }
+    body{
+      touch-action:pan-y;
+      -webkit-touch-callout:none;
+    }
+    body, body *{
+      user-select:none;
+      -webkit-user-select:none;
+    }
+    input, textarea, select,
+    [contenteditable="true"],
+    .allow-text-selection{
+      user-select:text;
+      -webkit-user-select:text;
+    }
     .touch{min-height:84px}
     ::-webkit-scrollbar{width:0;height:0}
     /* Portrait guidance: constrain main content to 1080px width for 1080×1920 portrait displays */
