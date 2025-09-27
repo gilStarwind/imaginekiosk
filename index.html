@@ -50,6 +50,8 @@
     }
     body{
       touch-action:pan-y;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
     }
     #introScreen,
     header,
@@ -71,7 +73,14 @@
       -webkit-user-select:text;
       -webkit-touch-callout:default;
     }
-    .touch{min-height:84px}
+    .touch{
+      min-height:84px;
+      touch-action:pan-y;
+    }
+    .mission-card,
+    #grid{
+      touch-action:pan-y;
+    }
     ::-webkit-scrollbar{width:0;height:0}
     /* Portrait guidance: constrain main content to 1080px width for 1080×1920 portrait displays */
     .portrait-wrap{max-width:1080px;margin:0 auto}
