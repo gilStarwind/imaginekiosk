@@ -88,6 +88,17 @@ const registerButtons = () => {
   dom.splashBtn?.addEventListener('pointerdown', () => triggerBounce(dom.splashBtn));
 };
 
+const registerSelectionGuards = () => {
+  const allowSelector = 'input, textarea, select, [contenteditable="true"], .allow-text-selection';
+  document.addEventListener('selectstart', (event) => {
+    const target = event.target;
+    if (target && typeof target.closest === 'function' && target.closest(allowSelector)) {
+      return;
+    }
+    event.preventDefault();
+  });
+};
+
 const bootstrap = async () => {
   initQR();
   initWeb();
@@ -97,6 +108,7 @@ const bootstrap = async () => {
   registerModalClosers();
   registerGestures();
   registerIdleReset();
+  registerSelectionGuards();
   dom.dImage?.addEventListener('pointerdown', () => triggerBounce(dom.dImage));
   // Delegate clicks for in-app web links
   document.addEventListener('click', (e) => {

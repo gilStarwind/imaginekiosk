@@ -50,17 +50,18 @@
     }
     body{
       touch-action:pan-y;
-      -webkit-touch-callout:none;
     }
     body, body *{
       user-select:none;
       -webkit-user-select:none;
+      -webkit-touch-callout:none;
     }
     input, textarea, select,
     [contenteditable="true"],
     .allow-text-selection{
       user-select:text;
       -webkit-user-select:text;
+      -webkit-touch-callout:default;
     }
     .touch{min-height:84px}
     ::-webkit-scrollbar{width:0;height:0}
@@ -443,7 +444,7 @@
   <div id="adminModal" class="fixed inset-x-0 top-[72px] bottom-0 hidden z-50">
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-close="admin"></div>
     <div class="relative h-full overflow-y-auto z-10">
-      <div class="admin-panel mx-auto my-4 w-full max-w-[980px] rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-5 shadow-2xl shadow-emerald-950/40">
+      <div class="admin-panel mx-auto my-4 w-full max-w-[980px] rounded-3xl bg-slate-950/90 border border-emerald-800/50 p-6 space-y-5 shadow-2xl shadow-emerald-950/40 allow-text-selection">
         <div class="flex items-center justify-between">
           <h4 class="text-xl font-bold">Admin</h4>
           <button class="btn btn-secondary touch" data-close="admin">Close</button>
