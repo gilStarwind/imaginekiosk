@@ -31,9 +31,9 @@ sleep 1
 
 # Prevent screen blanking (ignore if we still cannot talk to X)
 if command -v xset >/dev/null 2>&1 && xset q >/dev/null 2>&1; then
-  xset s off || true
-  xset -dpms || true
-  xset s noblank || true
+  xset s off >/dev/null 2>&1 || true
+  xset -dpms >/dev/null 2>&1 || true
+  xset s noblank >/dev/null 2>&1 || true
 else
   echo "Warning: unable to reach display \"$DISPLAY\"; skipping xset tweaks" >&2
 fi
