@@ -52,6 +52,15 @@
       touch-action:pan-y;
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
+      scrollbar-width: thin;
+    }
+    body::-webkit-scrollbar{ width:8px; }
+    body::-webkit-scrollbar-thumb{
+      background: rgba(148,163,184,0.35);
+      border-radius:999px;
+    }
+    body::-webkit-scrollbar-track{
+      background: rgba(15,23,42,0.55);
     }
     #introScreen,
     header,

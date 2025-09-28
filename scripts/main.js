@@ -88,6 +88,37 @@ const registerButtons = () => {
   dom.splashBtn?.addEventListener('pointerdown', () => triggerBounce(dom.splashBtn));
 };
 
+const registerScrollFallback = () => {
+  const hasNativeTouch = typeof navigator !== 'undefined' && Number(navigator.maxTouchPoints || 0) > 0;
+  // Some controllers advertise multi-touch but still deliver mouse-like events; always enable fallback.
+  const allowSelector = 'input, textarea, select, [contenteditable="true"], .allow-text-selection';
+  let activePointer = null;
+  let lastY = 0;
+
+  const isEditableTarget = (node) => node && typeof node.closest === 'function' && node.closest(allowSelector);
+
+  const endDrag = () => { activePointer = null; };
+
+  document.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    if (isEditableTarget(event.target)) return;
+    activePointer = event.pointerId;
+    lastY = event.clientY;
+  });
+
+  document.addEventListener('pointermove', (event) => {
+    if (event.pointerId !== activePointer) return;
+    const deltaY = event.clientY - lastY;
+    if (Math.abs(deltaY) < 1) return;
+    window.scrollBy({ top: -deltaY, behavior: 'auto' });
+    lastY = event.clientY;
+  }, { passive: true });
+
+  ['pointerup', 'pointercancel', 'pointerout', 'pointerleave'].forEach((type) => {
+    document.addEventListener(type, endDrag);
+  });
+};
+
 const bootstrap = async () => {
   initQR();
   initWeb();
@@ -97,6 +128,7 @@ const bootstrap = async () => {
   registerModalClosers();
   registerGestures();
   registerIdleReset();
+  registerScrollFallback();
   dom.dImage?.addEventListener('pointerdown', () => triggerBounce(dom.dImage));
   // Delegate clicks for in-app web links
   document.addEventListener('click', (e) => {
