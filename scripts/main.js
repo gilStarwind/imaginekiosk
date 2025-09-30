@@ -86,6 +86,8 @@ const registerButtons = () => {
   dom.homeBtn?.addEventListener('pointerdown', () => triggerBounce(dom.homeBtn));
   dom.splashBtn?.addEventListener('click', returnToIntro);
   dom.splashBtn?.addEventListener('pointerdown', () => triggerBounce(dom.splashBtn));
+  dom.settingsBtn?.addEventListener('click', openAdmin);
+  dom.settingsBtn?.addEventListener('pointerdown', () => triggerBounce(dom.settingsBtn));
 };
 
 const registerScrollFallback = () => {

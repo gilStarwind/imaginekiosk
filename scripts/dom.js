@@ -8,6 +8,7 @@ export const dom = {
   backBtn: qs('#backBtn'),
   homeBtn: qs('#homeBtn'),
   splashBtn: qs('#splashBtn'),
+  settingsBtn: qs('#settingsBtn'),
   headerEl: document.querySelector('header'),
   mainEl: document.querySelector('main'),
   introScreen: qs('#introScreen'),
