@@ -90,7 +90,10 @@ const registerButtons = () => {
 
 const registerScrollFallback = () => {
   const hasNativeTouch = typeof navigator !== 'undefined' && Number(navigator.maxTouchPoints || 0) > 0;
-  // Some controllers advertise multi-touch but still deliver mouse-like events; always enable fallback.
+  const hasFinePointer = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(any-pointer: fine)').matches;
+  // Skip the fallback on pure touch setups; hybrids still benefit because their drag reports as mouse.
+  if (hasNativeTouch && !hasFinePointer) return;
+
   const allowSelector = 'input, textarea, select, [contenteditable="true"], .allow-text-selection';
   const isEditableTarget = (node) => node && typeof node.closest === 'function' && node.closest(allowSelector);
 
@@ -99,14 +102,18 @@ const registerScrollFallback = () => {
   let startY = 0;
   let isDragging = false;
   let scrollTarget = window;
+  let captureTarget = null;
 
-  const DRAG_THRESHOLD = 3; // pixels before we treat movement as a scroll gesture
-  const SCROLL_MULTIPLIER = 1.6; // amplify drag distance for quicker scroll response
+  const DRAG_THRESHOLD = 4; // pixels before we treat movement as a scroll gesture
+  const SCROLL_MULTIPLIER = 1.25; // give a slight boost so small drags produce visible scroll
 
   const findScrollContainer = (node) => {
     let current = node;
     while (current && current !== document.body) {
-      if (isEditableTarget(current)) return null;
+      if (isEditableTarget(current) && current === node) {
+        current = current.parentElement;
+        continue;
+      }
       const style = window.getComputedStyle(current);
       const overflowY = style.overflowY;
       const canScroll = (overflowY === 'auto' || overflowY === 'scroll') && current.scrollHeight > current.clientHeight;
@@ -119,19 +126,35 @@ const registerScrollFallback = () => {
   };
 
   const endDrag = () => {
+    if (captureTarget && typeof captureTarget.releasePointerCapture === 'function' && activePointer !== null) {
+      try {
+        captureTarget.releasePointerCapture(activePointer);
+      } catch (err) {
+        // ignore release errors
+      }
+    }
     activePointer = null;
     isDragging = false;
     scrollTarget = window;
+    captureTarget = null;
   };
 
   document.addEventListener('pointerdown', (event) => {
     if (event.pointerType !== 'mouse' || event.button !== 0) return;
-    if (isEditableTarget(event.target)) return;
     activePointer = event.pointerId;
     lastY = event.clientY;
     startY = event.clientY;
     isDragging = false;
-    scrollTarget = findScrollContainer(event.target) || window;
+    const origin = findScrollContainer(event.target) || window;
+    scrollTarget = origin;
+    if (event.target?.setPointerCapture) {
+      try {
+        event.target.setPointerCapture(event.pointerId);
+        captureTarget = event.target;
+      } catch (err) {
+        captureTarget = null;
+      }
+    }
   });
 
   document.addEventListener('pointermove', (event) => {
@@ -142,6 +165,7 @@ const registerScrollFallback = () => {
       if (Math.abs(totalDelta) < DRAG_THRESHOLD) return;
       isDragging = true;
     }
+    event.preventDefault();
     if (Math.abs(deltaY) < 1) return;
     const adjustedDelta = deltaY * SCROLL_MULTIPLIER;
     if (scrollTarget === window) {
@@ -150,7 +174,7 @@ const registerScrollFallback = () => {
       scrollTarget.scrollTop -= adjustedDelta;
     }
     lastY = event.clientY;
-  }, { passive: true });
+  }, { passive: false });
 
   ['pointerup', 'pointercancel', 'pointerout', 'pointerleave'].forEach((type) => {
     document.addEventListener(type, endDrag);
