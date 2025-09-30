@@ -176,7 +176,7 @@ const bootstrap = async () => {
   });
 
   await hydrateState();
-  renderHome();
+  startApp();
 };
 
 bootstrap();

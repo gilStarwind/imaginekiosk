@@ -296,7 +296,7 @@
   </style>
 </head>
 <body class="min-h-screen">
-  <div id="introScreen" class="fixed inset-0 z-50 flex items-center justify-center px-6 py-10 md:px-10">
+  <div id="introScreen" class="hidden fixed inset-0 z-50 flex items-center justify-center px-6 py-10 md:px-10">
     <div class="intro-panel text-center">
       <div class="intro-media hidden" id="introMedia">
         <img id="introImage" alt="Welcome visual" />
@@ -459,10 +459,6 @@
   <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/85 border-t border-emerald-900/60">
     <div class="portrait-wrap px-5 py-2 flex items-center justify-between text-teal-200/70 text-sm gap-4">
       <span id="footerTip" class="flex-1">Tap Back or Home anytime • Idle reset after <span id="footerIdle">60</span>s</span>
-      <button id="splashBtn" class="btn btn-ghost btn-footer inline-flex items-center gap-2 text-teal-200/80">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M12 6.75a.75.75 0 0 1 .75.75v3h3a.75.75 0 0 1 0 1.5h-3.75a.75.75 0 0 1-.75-.75V7.5a.75.75 0 0 1 .75-.75z"/><path d="M7.574 3.04a.75.75 0 0 1 .386.966A8.25 8.25 0 1 0 19.5 12a.75.75 0 0 1 1.5 0 9.75 9.75 0 1 1-13.6-9.023.75.75 0 0 1 .174-.937z"/></svg>
-        <span>Return to Splash</span>
-      </button>
     </div>
   </footer>
 
