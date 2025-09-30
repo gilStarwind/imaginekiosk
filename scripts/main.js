@@ -92,25 +92,61 @@ const registerScrollFallback = () => {
   const hasNativeTouch = typeof navigator !== 'undefined' && Number(navigator.maxTouchPoints || 0) > 0;
   // Some controllers advertise multi-touch but still deliver mouse-like events; always enable fallback.
   const allowSelector = 'input, textarea, select, [contenteditable="true"], .allow-text-selection';
-  let activePointer = null;
-  let lastY = 0;
-
   const isEditableTarget = (node) => node && typeof node.closest === 'function' && node.closest(allowSelector);
 
-  const endDrag = () => { activePointer = null; };
+  let activePointer = null;
+  let lastY = 0;
+  let startY = 0;
+  let isDragging = false;
+  let scrollTarget = window;
+
+  const DRAG_THRESHOLD = 6; // pixels before we treat movement as a scroll gesture
+
+  const findScrollContainer = (node) => {
+    let current = node;
+    while (current && current !== document.body) {
+      if (isEditableTarget(current)) return null;
+      const style = window.getComputedStyle(current);
+      const overflowY = style.overflowY;
+      const canScroll = (overflowY === 'auto' || overflowY === 'scroll') && current.scrollHeight > current.clientHeight;
+      if (canScroll) {
+        return current;
+      }
+      current = current.parentElement;
+    }
+    return window;
+  };
+
+  const endDrag = () => {
+    activePointer = null;
+    isDragging = false;
+    scrollTarget = window;
+  };
 
   document.addEventListener('pointerdown', (event) => {
     if (event.pointerType !== 'mouse' || event.button !== 0) return;
     if (isEditableTarget(event.target)) return;
     activePointer = event.pointerId;
     lastY = event.clientY;
+    startY = event.clientY;
+    isDragging = false;
+    scrollTarget = findScrollContainer(event.target) || window;
   });
 
   document.addEventListener('pointermove', (event) => {
     if (event.pointerId !== activePointer) return;
     const deltaY = event.clientY - lastY;
+    if (!isDragging) {
+      const totalDelta = event.clientY - startY;
+      if (Math.abs(totalDelta) < DRAG_THRESHOLD) return;
+      isDragging = true;
+    }
     if (Math.abs(deltaY) < 1) return;
-    window.scrollBy({ top: -deltaY, behavior: 'auto' });
+    if (scrollTarget === window) {
+      window.scrollBy({ top: -deltaY, behavior: 'auto' });
+    } else if (scrollTarget && typeof scrollTarget.scrollTop === 'number') {
+      scrollTarget.scrollTop -= deltaY;
+    }
     lastY = event.clientY;
   }, { passive: true });
 
