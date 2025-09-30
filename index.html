@@ -350,14 +350,14 @@
 
       <!-- Dynamic hero / rotating highlights -->
       <div id="highlight" class="mt-6 rounded-3xl border border-emerald-700/40 bg-slate-900/70 p-5 shadow-xl shadow-emerald-950/30">
-        <div class="flex flex-col gap-5 items-center">
-          <div class="shrink-0 w-full hero-img rounded-2xl bg-emerald-900/60 overflow-hidden">
+        <div class="flex flex-col items-center gap-5 xl:flex-row xl:items-stretch xl:gap-8">
+          <div class="hero-img w-full shrink-0 rounded-2xl bg-emerald-900/60 overflow-hidden xl:w-[46%] xl:max-h-[26rem]">
             <img id="hlImage" class="w-full h-full object-cover" alt="Mission highlight"/>
           </div>
-          <div class="w-full text-center">
+          <div class="w-full text-center xl:flex-1 xl:text-left xl:flex xl:flex-col xl:justify-center">
             <h2 id="hlTitle" class="display-h2 font-bold"></h2>
             <p id="hlBlurb" class="mt-2 display-lead text-teal-100/90"></p>
-            <div class="mt-4 flex flex-wrap gap-3 justify-center">
+            <div class="mt-4 flex flex-wrap gap-3 justify-center xl:justify-start">
               <button id="hlOpen" class="btn btn-primary touch">Explore</button>
             </div>
           </div>

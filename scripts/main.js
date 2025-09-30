@@ -100,7 +100,8 @@ const registerScrollFallback = () => {
   let isDragging = false;
   let scrollTarget = window;
 
-  const DRAG_THRESHOLD = 6; // pixels before we treat movement as a scroll gesture
+  const DRAG_THRESHOLD = 3; // pixels before we treat movement as a scroll gesture
+  const SCROLL_MULTIPLIER = 1.6; // amplify drag distance for quicker scroll response
 
   const findScrollContainer = (node) => {
     let current = node;
@@ -142,10 +143,11 @@ const registerScrollFallback = () => {
       isDragging = true;
     }
     if (Math.abs(deltaY) < 1) return;
+    const adjustedDelta = deltaY * SCROLL_MULTIPLIER;
     if (scrollTarget === window) {
-      window.scrollBy({ top: -deltaY, behavior: 'auto' });
+      window.scrollBy({ top: -adjustedDelta, behavior: 'auto' });
     } else if (scrollTarget && typeof scrollTarget.scrollTop === 'number') {
-      scrollTarget.scrollTop -= deltaY;
+      scrollTarget.scrollTop -= adjustedDelta;
     }
     lastY = event.clientY;
   }, { passive: true });
