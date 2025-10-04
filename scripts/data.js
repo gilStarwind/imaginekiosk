@@ -116,9 +116,9 @@ export const DEFAULT_SETTINGS = {
   idleMs: 60000,
   highlightMs: 10000,
   theme: 'evergreen',
-  splashTitle: 'Welcome to Imagine Church',
-  splashSubtitle: 'Tap below to explore how Imagine Church is moving through missions and outreach.',
-  splashImage: '',
+  splashTitle: 'Imagine Serving Others',
+  splashSubtitle: 'Touch to discover stories of hope and find your place to serve.',
+  splashImage: LOGO_URL,
   // Domains that should not be opened in the in-app iframe (suffix match)
   webBlocklist: ['wycliffe.org', 'facebook.com', 'rideabilitysc.com']
 };

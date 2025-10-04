@@ -88,6 +88,12 @@ const registerButtons = () => {
   dom.splashBtn?.addEventListener('pointerdown', () => triggerBounce(dom.splashBtn));
   dom.settingsBtn?.addEventListener('click', openAdmin);
   dom.settingsBtn?.addEventListener('pointerdown', () => triggerBounce(dom.settingsBtn));
+  dom.introScreen?.addEventListener('pointerdown', (event) => {
+    if (state.appStarted) return;
+    const onButton = event.target?.closest?.('button, a, input, textarea, select, [role="button"]');
+    if (onButton && onButton === dom.settingsBtn) return;
+    startApp();
+  });
 };
 
 const registerScrollFallback = () => {
@@ -204,7 +210,6 @@ const bootstrap = async () => {
   });
 
   await hydrateState();
-  startApp();
 };
 
 bootstrap();
