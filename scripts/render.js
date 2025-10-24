@@ -99,13 +99,15 @@ export function gotoDetail(id) {
   }
   triggerBounce(dom.dImage);
 
-  dom.dContact.innerHTML = mission.contact
-    ? html`<a class="inline-flex items-center gap-2 text-cyan-200 underline decoration-cyan-300/70 decoration-2 underline-offset-4" href="mailto:${mission.contact}">${escapeHTML(mission.contact)}</a>`
-    : '—';
+  if (dom.dContact) {
+    dom.dContact.textContent = mission.contact || '—';
+  }
 
-  dom.dLinks.innerHTML = html`${(mission.links || []).map(
-    (link) => html`<a class="btn btn-primary touch inline-flex items-center justify-center" data-openweb="${escapeAttr(link.href)}" href="#">${escapeHTML(link.label)}</a>`
-  )}`;
+  if (dom.dLinks) {
+    // Outbound website buttons disabled for kiosk stability
+    dom.dLinks.innerHTML = '';
+    dom.dLinks.classList.add('hidden');
+  }
 
   const viewCount = incrementViewsFor(mission.id);
   dom.dViews.textContent = `Views: ${viewCount}`;

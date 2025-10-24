@@ -600,7 +600,7 @@ export const initAdmin = () => {
       dom.adminKioskGuide.textContent = text;
       dom.adminKioskGuide.dataset.loaded = 'true';
     } catch (err) {
-      dom.adminKioskGuide.textContent = 'Could not load README_KIOSK.md. Use the "Open in New Tab" link above.';
+      dom.adminKioskGuide.textContent = 'Could not load README_KIOSK.md. Open the README directly from the kiosk files.';
     }
   });
 
