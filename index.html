@@ -27,22 +27,27 @@
       },0);
     })();
   </script>
+  <!-- JSZip for zip file creation -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <!-- Local QR generator for offline use -->
   <script src="scripts/vendor/qrcode.min.js"></script>
   <style>
     :root{
       /* Theme variables (overridden by selected preset) */
-      --brand:#62b37a;
-      --brand-700:#3b8d5e;
-      --brand-900:#1f5d3f;
-      --on-brand:#06130d;
-      --surface:#0b1220;
+      --brand:#00f2a1;
+      --brand-700:#00d990;
+      --brand-900:#00a66f;
+      --on-brand:#001a13;
+      --surface:#0a0c10;
       --surface-2:#0f172a;
-      --on-surface:#d1fae5;
-      --text-base:#d1fae5;
-      --text-muted:#99f6e4;
-      --text-subtle:#a7f3d0;
-      --bg-gradient:linear-gradient(180deg,#022c22 0%,#02131b 55%,#031c28 100%);
+      --on-surface:#e0f2fe;
+      --text-base:#e0f2fe;
+      --text-muted:#94a3b8;
+      --text-subtle:#cbd5e1;
+      --bg-gradient:
+        radial-gradient(at 25% 15%, hsla(164, 100%, 78%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 75% 95%, hsla(215, 98%, 79%, 0.1) 0px, transparent 50%),
+        linear-gradient(160deg, #0a0c10 0%, #0f172a 100%);
     }
     html, body{
       background:var(--bg-gradient);
@@ -212,10 +217,10 @@
       gap: clamp(1.8rem, 3.5vw, 3.2rem);
       padding: clamp(2.8rem, 6vw, 4.5rem);
       border-radius: 3rem;
-      background: rgba(5, 21, 32, 0.72);
-      border: 1px solid rgba(99, 255, 210, 0.22);
-      box-shadow: 0 40px 90px rgba(0,0,0,0.45), 0 0 80px rgba(59, 230, 190, 0.18);
-      backdrop-filter: blur(22px);
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      box-shadow: 0 40px 90px rgba(0,0,0,0.45), 0 0 80px rgba(0, 242, 161, 0.1);
+      backdrop-filter: blur(32px) saturate(120%);
       max-width: clamp(28rem, 60vw, 38rem);
     }
     .intro-media{ width: clamp(12rem, 38vw, 19rem); height: clamp(12rem, 38vw, 19rem); border-radius: 2rem; overflow: hidden; border: 2px solid rgba(99,255,210,0.35); background: rgba(15,23,42,0.85); display:flex; align-items:center; justify-content:center; box-shadow: 0 20px 45px rgba(0,0,0,0.35); }
@@ -230,17 +235,17 @@
     .splash-preview{ width: 96px; height: 96px; border-radius: 1rem; overflow:hidden; border:1px solid rgba(16,185,129,0.4); background: rgba(15,23,42,0.6); display:flex; align-items:center; justify-content:center; }
     .splash-preview img{ width:100%; height:100%; object-fit:cover; }
     @keyframes hero-pan {
-      0%{ transform: scale(1.05) translateX(-1.5%); }
-      50%{ transform: scale(1.08) translateX(1.5%); }
-      100%{ transform: scale(1.05) translateX(-1.5%); }
+      0%{ transform: scale(1.02) translateX(-1%); }
+      50%{ transform: scale(1.05) translateX(1%); }
+      100%{ transform: scale(1.02) translateX(-1%); }
     }
     @keyframes card-fade-up {
       from{ opacity:0; transform: translateY(18px) scale(0.96); }
       to{ opacity:1; transform: translateY(0) scale(1); }
     }
     @keyframes glow-pulse {
-      0%,100%{ box-shadow: 0 25px 60px rgba(0,0,0,0.25); }
-      50%{ box-shadow: 0 35px 80px rgba(0,0,0,0.32); }
+      0%,100%{ box-shadow: 0 0 40px -15px var(--brand), 0 0 70px -25px #000; }
+      50%{ box-shadow: 0 0 55px -15px var(--brand), 0 0 85px -25px #000; }
     }
     .hero-img{
       min-height: clamp(15rem, 24vh, 26rem);
@@ -316,8 +321,8 @@
         <img id="introImage" src="images/general/logo.png" alt="Imagine Church logo" />
       </div>
       <div class="intro-copy space-y-4">
-        <h1 id="introTitle" class="intro-title font-black tracking-tight">Imagine Serving Others</h1>
-        <p id="introSubtitle" class="intro-subtitle">Touch to discover stories of hope and find your place to serve.</p>
+        <h1 id="introTitle" class="intro-title font-black tracking-tight leading-snug">Welcome to the Missions Kiosk</h1>
+        <p id="introSubtitle" class="intro-subtitle">Discover stories of hope and find your place to serve.</p>
       </div>
       <div class="intro-actions flex flex-col items-center gap-3">
         <button id="startBtn" class="btn btn-primary touch intro-cta transition-transform duration-200 focus:outline-none focus:ring-4">
@@ -354,18 +359,18 @@
       <div class="flex flex-col items-center text-center gap-5">
         <img id="logo" alt="Imagine Church Logo" class="h-28 md:h-36 object-contain"/>
         <h1 class="display-title font-black tracking-tight">imagine serving others</h1>
-        <p class="display-lead text-teal-100/90 max-w-2xl">Tap a card to learn how you can pray, give, or serve with each mission.</p>
+        <p class="display-lead text-slate-300/80 max-w-2xl">Tap a card to learn how you can pray, give, or serve with each mission.</p>
       </div>
 
       <!-- Dynamic hero / rotating highlights -->
-      <div id="highlight" class="mt-6 rounded-3xl border border-emerald-700/40 bg-slate-900/70 p-5 shadow-xl shadow-emerald-950/30">
+      <div id="highlight" class="mt-6 rounded-3xl border border-slate-700/40 bg-slate-900/70 p-5 shadow-xl shadow-black/30">
         <div class="flex flex-col items-center gap-5 xl:flex-row xl:items-stretch xl:gap-8">
-          <div class="hero-img w-full shrink-0 rounded-2xl bg-emerald-900/60 overflow-hidden xl:w-[46%] xl:max-h-[26rem]">
+          <div class="hero-img w-full shrink-0 rounded-2xl bg-slate-800/60 overflow-hidden xl:w-[46%] xl:max-h-[26rem]">
             <img id="hlImage" class="w-full h-full object-cover" alt="Mission highlight"/>
           </div>
           <div class="w-full text-center xl:flex-1 xl:text-left xl:flex xl:flex-col xl:justify-center">
             <h2 id="hlTitle" class="display-h2 font-bold"></h2>
-            <p id="hlBlurb" class="mt-2 display-lead text-teal-100/90"></p>
+            <p id="hlBlurb" class="mt-2 display-lead text-slate-300/80"></p>
             <div class="mt-4 flex flex-wrap gap-3 justify-center xl:justify-start">
               <button id="hlOpen" class="btn btn-primary touch">Explore</button>
             </div>
@@ -465,9 +470,9 @@
     </div>
   </div>
 
-  <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/85 border-t border-emerald-900/60">
-    <div class="portrait-wrap px-5 py-2 flex items-center justify-between text-teal-200/70 text-sm gap-4">
-      <span id="footerTip" class="flex-1">Tap Back or Home anytime • Idle reset after <span id="footerIdle">60</span>s</span>
+  <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/80 backdrop-blur-sm border-t border-slate-700/40">
+    <div class="portrait-wrap px-5 py-2 flex items-center justify-between text-slate-400/90 text-sm gap-4">
+      <span id="footerTip" class="flex-1">Back/Home clear idle • Auto-resets in <span id="footerIdle">60</span>s</span>
       <button id="settingsBtn" class="btn btn-secondary btn-footer touch footer-settings">Settings</button>
     </div>
   </footer>
@@ -632,6 +637,21 @@
             <label class="block space-y-2">
               <span class="text-teal-200/80">Highlight rotation (seconds)</span>
               <input id="adminHighlight" type="number" min="3" class="input-field" />
+            </label>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="block space-y-2">
+              <span class="text-teal-200/80">Server Port</span>
+              <input id="adminPort" type="number" min="1024" max="65535" class="input-field" />
+            </label>
+            <label class="block space-y-2">
+              <span class="text-teal-200/80">Screen Rotation</span>
+              <select id="adminRotation" class="select-field">
+                <option value="normal">Normal</option>
+                <option value="right">Right (90°)</option>
+                <option value="left">Left (270°)</option>
+                <option value="inverted">Inverted (180°)</option>
+              </select>
             </label>
           </div>
           <label class="block space-y-2">

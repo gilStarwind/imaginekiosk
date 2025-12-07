@@ -46,6 +46,8 @@ export const dom = {
   adminAnnouncementInput: qs('#adminAnnouncement'),
   adminIdleInput: qs('#adminIdle'),
   adminHighlightInput: qs('#adminHighlight'),
+  adminPort: qs('#adminPort'),
+  adminRotation: qs('#adminRotation'),
   adminThemeSelect: qs('#adminTheme'),
   adminMissionList: qs('#adminMissionList'),
   adminSummary: qs('#adminSummary'),

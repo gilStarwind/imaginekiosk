@@ -317,35 +317,25 @@ const renderAdminMissions = () => {
   renderAdminSummary();
 };
 
-const csvEscape = (value) => {
-  const text = value == null ? '' : String(value);
-  const escaped = text.replace(/"/g, '""');
-  return `"${escaped}"`;
-};
 
-const missionsToCsv = (missions) => {
-  const header = ['id', 'title', 'subtitle', 'focus', 'involved', 'contact', 'body', 'image', 'links'];
-  const rows = missions.map((mission) => [
-    mission.id || '',
-    mission.title || '',
-    mission.subtitle || '',
-    mission.focus || '',
-    mission.involved || '',
-    mission.contact || '',
-    mission.body || '',
-    mission.image || '',
-    serializeLinks(mission.links || [])
-  ]);
-  return [header, ...rows]
-    .map((columns) => columns.map(csvEscape).join(','))
-    .join('\r\n');
-};
 
 const downloadData = async () => {
+  if (typeof JSZip === 'undefined') {
+    alert('Backup feature is unavailable. Could not load a required library.');
+    return;
+  }
+
   try {
+    const zip = new JSZip();
     const missions = state.pendingMissions?.length ? state.pendingMissions : state.missions;
-    const csv = missionsToCsv(missions);
-    const suggestedName = `missions-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    const settings = state.pendingSettings || state.settings;
+    
+    // Add missions and settings to the zip file with pretty formatting
+    zip.file('missions.json', JSON.stringify(missions, null, 2));
+    zip.file('config.json', JSON.stringify(settings, null, 2));
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const suggestedName = `kiosk-backup-${new Date().toISOString().slice(0, 10)}.zip`;
 
     if (window.showSaveFilePicker) {
       try {
@@ -353,24 +343,23 @@ const downloadData = async () => {
           suggestedName,
           types: [
             {
-              description: 'CSV Files',
-              accept: { 'text/csv': ['.csv'] }
+              description: 'Zip Files',
+              accept: { 'application/zip': ['.zip'] }
             }
           ]
         });
         const writable = await handle.createWritable();
-        await writable.write(csv);
+        await writable.write(content);
         await writable.close();
         return;
       } catch (err) {
-        if (err?.name === 'AbortError') {
-          return;
-        }
+        if (err?.name === 'AbortError') return; // User cancelled, do nothing
         console.warn('save picker failed, falling back to download', err);
       }
     }
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    // Fallback for browsers without showSaveFilePicker
+    const blob = new Blob([content], { type: 'application/zip' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
@@ -379,8 +368,10 @@ const downloadData = async () => {
     anchor.click();
     document.body.removeChild(anchor);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+
   } catch (err) {
     console.warn('download failed', err);
+    alert('Could not create backup file. See console for details.');
   }
 };
 
@@ -401,6 +392,8 @@ const initAdminPanel = () => {
   dom.adminAnnouncementInput.value = state.pendingSettings.announcement || '';
   dom.adminIdleInput.value = Math.round((state.pendingSettings.idleMs || 60000) / 1000);
   dom.adminHighlightInput.value = Math.round((state.pendingSettings.highlightMs || 8000) / 1000);
+  dom.adminPort.value = state.pendingSettings.port || '8080';
+  dom.adminRotation.value = state.pendingSettings.screenRotation || 'normal';
   if (dom.adminSplashTitle) dom.adminSplashTitle.value = state.pendingSettings.splashTitle || '';
   if (dom.adminSplashSubtitle) dom.adminSplashSubtitle.value = state.pendingSettings.splashSubtitle || '';
   if (dom.adminSplashImage) dom.adminSplashImage.value = state.pendingSettings.splashImage || '';
@@ -464,19 +457,47 @@ export const closeAdmin = () => {
   closeAdminInternal();
 };
 
-const applyPendingChanges = () => {
+const applyPendingChanges = async () => {
   if (!state.pendingMissions.length) return;
   if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
-  state.missions = clone(state.pendingMissions);
-  state.settings = { ...state.settings, ...state.pendingSettings };
-  saveMissions(state.missions, state.meta);
-  saveSettings(state.settings);
-  applyTheme(state.settings.theme);
-  updateAnnouncement();
-  updateFooter();
-  updateSplash();
-  renderHome();
-  closeAdminInternal();
+
+  const btn = dom.adminSaveBtn;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+  }
+
+  try {
+    state.missions = clone(state.pendingMissions);
+    state.settings = { ...state.settings, ...state.pendingSettings };
+    
+    await saveMissions(state.missions, state.meta);
+    await saveSettings(state.settings);
+
+    if (btn) btn.textContent = 'Saved!';
+
+    applyTheme(state.settings.theme);
+    updateAnnouncement();
+    updateFooter();
+    updateSplash();
+    renderHome();
+    
+    setTimeout(() => {
+      closeAdminInternal();
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Save & Close';
+      }
+    }, 400);
+
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Save Failed (Retry)';
+    }
+    // Optionally, show an error message to the user here
+    console.error('Failed to save changes:', err);
+  }
 };
 
 const handleCsvText = (text) => {
@@ -509,15 +530,23 @@ export const initAdmin = () => {
 
   dom.adminSaveBtn?.addEventListener('click', applyPendingChanges);
 
-  dom.adminClearBtn?.addEventListener('click', () => {
-    localStorage.removeItem('missions:data');
-    localStorage.removeItem('missions:meta');
+  dom.adminClearBtn?.addEventListener('click', async () => {
+    if (!confirm('This will REMOVE all missions and restore the default example. Are you sure?')) return;
+    
     state.meta.updatedAt = null;
     state.missions = clone(DEFAULT_MISSIONS);
     state.pendingMissions = clone(state.missions);
-    renderHome();
-    renderAdminSummary();
-    renderAdminMissions();
+
+    try {
+      await saveMissions(state.missions);
+      // Re-render UI
+      renderHome();
+      renderAdminSummary();
+      renderAdminMissions();
+    } catch (err) {
+      console.error('Failed to clear missions:', err);
+      // Optionally show an error to the user
+    }
   });
 
   dom.adminDownloadBtn?.addEventListener('click', downloadData);
@@ -808,6 +837,16 @@ export const initAdmin = () => {
     if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
     const seconds = Math.max(3, parseInt(event.target.value, 10) || 8);
     state.pendingSettings.highlightMs = seconds * 1000;
+  });
+
+  dom.adminPort?.addEventListener('input', (event) => {
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.port = parseInt(event.target.value, 10) || 8080;
+  });
+
+  dom.adminRotation?.addEventListener('input', (event) => {
+    if (!state.pendingSettings) state.pendingSettings = { ...state.settings };
+    state.pendingSettings.screenRotation = event.target.value;
   });
 
   dom.adminThemeSelect?.addEventListener('change', (event) => {

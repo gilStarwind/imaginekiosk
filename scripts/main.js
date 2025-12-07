@@ -10,32 +10,44 @@ import { fetchCsv } from './csv.js';
 import { clone } from './helpers.js';
 
 const hydrateState = async () => {
-  loadMeta(state.meta);
-  state.settings = loadSettings(state.settings);
+  // Settings are loaded first as they can influence other parts of the app.
+  state.settings = await loadSettings(state.settings);
   if (!THEMES[state.settings.theme]) {
     state.settings.theme = 'evergreen';
   }
+  
+  // Apply visual theme and static content first
   applyTheme(state.settings.theme);
   updateFooter();
+  updateAnnouncement();
+  updateSplash();
 
   try {
-    const stored = loadMissions();
-    if (stored) {
+    const stored = await loadMissions();
+    if (stored && stored.length) {
       state.missions = stored;
     } else if (SHEET_CSV_URL) {
+      console.log('No local missions found, trying to fetch from remote CSV...');
       const remote = await fetchCsv(SHEET_CSV_URL);
       if (Array.isArray(remote) && remote.length) {
         state.missions = remote;
+        // Immediately save the fetched missions to the local file for offline use.
+        await saveMissions(state.missions);
       }
+    } else {
+      // Fallback to default if no other source is available
+      state.missions = clone(DEFAULT_MISSIONS);
     }
   } catch (err) {
-    console.warn('CSV load failed', err);
+    console.warn('Mission loading failed, falling back to defaults.', err);
     state.missions = clone(DEFAULT_MISSIONS);
   }
 
-  updateAnnouncement();
-  updateSplash();
+  // Set pending settings for the admin panel.
   state.pendingSettings = { ...state.settings };
+
+  // Now that missions are loaded, render the main view.
+  renderHome();
 };
 
 const registerGestures = () => {

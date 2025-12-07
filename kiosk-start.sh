@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Launch local server and Chromium kiosk on Raspberry Pi
-# Usage: ./kiosk-start.sh [PORT]
-
-PORT="${1:-${PORT:-8080}}"
-# Optional rotation: left | right | inverted | normal
-# Can be passed as $2 or via ROTATE env var
-ROTATE="${2:-${ROTATE:-}}"
+# --- Configuration ---
 DIR="$(cd "$(dirname "$0")" && pwd)"
+CONFIG_FILE="$DIR/config.json"
 
+# Read config from JSON if available, otherwise use env vars or defaults.
+if [ -f "$CONFIG_FILE" ] && command -v jq >/dev/null; then
+  # Use `jq -r` to get raw string; add fallback `// "default"`
+  PORT_FROM_CONFIG=$(jq -r '.port // "8080"' "$CONFIG_FILE")
+  ROTATE_FROM_CONFIG=$(jq -r '.screenRotation // "normal"' "$CONFIG_FILE")
+  # jq returns "null" for missing keys; treat it as empty
+  [ "$PORT_FROM_CONFIG" = "null" ] && PORT_FROM_CONFIG=""
+  [ "$ROTATE_FROM_CONFIG" = "null" ] && ROTATE_FROM_CONFIG=""
+elif [ -f "$CONFIG_FILE" ]; then
+    echo "Warning: 'jq' command not found. Cannot read from config.json. Using defaults." >&2
+fi
+
+# Precedence: command-line arg -> env var -> config file -> default
+PORT="${1:-${PORT:-${PORT_FROM_CONFIG:-8080}}}"
+ROTATE="${2:-${ROTATE:-${ROTATE_FROM_CONFIG:-normal}}}"
+
+# --- Environment Setup ---
 # Ensure we point at the active X display when launched from SSH/TTY
 if [ -z "${DISPLAY:-}" ]; then
   export DISPLAY=:0
@@ -25,13 +37,13 @@ if [ -z "${XAUTHORITY:-}" ]; then
   done
 fi
 
-# If a rotation was requested, apply it and map touch to the primary output
+# --- Rotation Logic ---
 apply_rotation_and_mapping() {
-  [ -z "$ROTATE" ] && return 0
+  [ -z "$ROTATE" ] || [ "$ROTATE" = "normal" ] && return 0
 
   # Normalize rotation value
   case "$ROTATE" in
-    left|right|inverted|normal) ;;
+    left|right|inverted) ;;
     90) ROTATE=right ;;
     180) ROTATE=inverted ;;
     270) ROTATE=left ;;
@@ -44,7 +56,6 @@ apply_rotation_and_mapping() {
       right) WL_ANGLE=90 ;;
       inverted) WL_ANGLE=180 ;;
       left) WL_ANGLE=270 ;;
-      normal) WL_ANGLE=normal ;;
     esac
     # Find first enabled output
     OUT=$(wlr-randr | awk '/enabled/{print name}{name=$1}' | head -n1)
@@ -67,14 +78,19 @@ apply_rotation_and_mapping() {
   fi
 }
 
+# --- Service Execution ---
+# Apply rotation before starting services
+apply_rotation_and_mapping
+
 # Start the local server in the background (localhost only)
-nohup python3 "$DIR/serve.py" --port "$PORT" --dir "$DIR" \
+# The DATA_DIR env var tells serve.py where to find missions.json and config.json
+nohup env DATA_DIR="$DIR" python3 "$DIR/serve.py" --port "$PORT" --dir "$DIR" \
   > /tmp/kiosk-server.log 2>&1 &
 
 # Give the server a moment to start
 sleep 1
 
-# Prevent screen blanking (ignore if we still cannot talk to X)
+# Prevent screen blanking
 if command -v xset >/dev/null 2>&1 && xset q >/dev/null 2>&1; then
   xset s off >/dev/null 2>&1 || true
   xset -dpms >/dev/null 2>&1 || true
@@ -83,7 +99,7 @@ else
   echo "Warning: unable to reach display \"$DISPLAY\"; skipping xset tweaks" >&2
 fi
 
-# Build Chromium flags with better touch support
+# Build Chromium flags
 CHROME_FLAGS=(
   --kiosk
   --incognito
@@ -101,7 +117,7 @@ if [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
   CHROME_FLAGS+=(--enable-features=UseOzonePlatform --ozone-platform=wayland)
 fi
 
-# Launch Chromium in kiosk mode to our localhost server
+# Launch Chromium in kiosk mode
 chromium-browser "http://localhost:${PORT}" "${CHROME_FLAGS[@]}" \
   > /tmp/kiosk-chromium.log 2>&1 &
 
