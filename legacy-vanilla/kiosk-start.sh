@@ -82,12 +82,13 @@ apply_rotation_and_mapping() {
 # Apply rotation before starting services
 apply_rotation_and_mapping
 
-# Start the Next.js production server in the background
-cd "$DIR" && nohup npm run start -- -p "$PORT" \
+# Start the local server in the background (localhost only)
+# The DATA_DIR env var tells serve.py where to find missions.json and config.json
+nohup env DATA_DIR="$DIR" python3 "$DIR/serve.py" --port "$PORT" --dir "$DIR" \
   > /tmp/kiosk-server.log 2>&1 &
 
-# Give the Next.js server a moment to start
-sleep 5
+# Give the server a moment to start
+sleep 1
 
 # Prevent screen blanking
 if command -v xset >/dev/null 2>&1 && xset q >/dev/null 2>&1; then
@@ -109,7 +110,6 @@ CHROME_FLAGS=(
   --enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching
   --overscroll-history-navigation=0
   --disable-pinch
-  --no-proxy-server
 )
 
 # If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland
