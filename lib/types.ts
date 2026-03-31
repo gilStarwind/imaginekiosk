@@ -24,4 +24,5 @@ export interface Settings {
   splashSubtitle: string;
   splashImage: string;
   webBlocklist: string[];
+  sheetUrl?: string;
 }

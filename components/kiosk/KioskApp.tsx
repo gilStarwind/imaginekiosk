@@ -17,6 +17,7 @@ export default function KioskApp({
 }) {
   const [mode, setMode] = useState<ViewMode>('splash');
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+  const [missions, setMissions] = useState<Mission[]>(initialMissions);
   
   const idleTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -31,6 +32,17 @@ export default function KioskApp({
     idleTimer.current = setTimeout(() => {
       setMode('splash');
       setSelectedMission(null);
+      
+      // Auto-sync Google Sheet silently in the background when falling back to idle
+      if (initialSettings.sheetUrl) {
+        fetch('/api/sync', { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.ok && Array.isArray(data.data)) {
+              setMissions(data.data);
+            }
+          }).catch(err => console.warn('Background sync failed:', err));
+      }
     }, initialSettings.idleMs || 60000);
   };
 
@@ -78,7 +90,7 @@ export default function KioskApp({
             {/* Soft decorative glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--color-brand)] opacity-10 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="glass-panel rounded-[3rem] p-12 md:p-16 flex flex-col items-center gap-8 max-w-2xl relative z-10">
+            <div className="glass-panel animate-floaty rounded-[3rem] p-12 md:p-16 flex flex-col items-center gap-8 max-w-2xl relative z-10">
               <div className="w-48 h-48 md:w-64 md:h-64 rounded-3xl overflow-hidden glass-panel border border-[var(--color-brand-700)] shadow-2xl p-4 flex items-center justify-center bg-white/5">
                 <img 
                   src={initialSettings.splashImage || '/images/general/logo.png'} 
@@ -118,7 +130,7 @@ export default function KioskApp({
             className="absolute inset-0 flex flex-col pt-16"
           >
             {/* HEADER */}
-            <header className="fixed top-0 inset-x-0 z-40 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-brand-900)]/40 p-4">
+            <header className="fixed top-0 inset-x-0 z-40 bg-[var(--color-surface)]/95 border-b border-[var(--color-brand-900)]/40 p-4">
               <div className="max-w-5xl mx-auto flex items-center gap-4">
                 {mode === 'detail' && (
                   <button 
@@ -164,7 +176,7 @@ export default function KioskApp({
                        </p>
                     </div>
 
-                    {initialMissions.map((mission, idx) => (
+                    {missions.map((mission, idx) => (
                       <motion.div
                         key={mission.id}
                         layoutId={`card-${mission.id}`}
@@ -205,7 +217,7 @@ export default function KioskApp({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 pt-24 bg-black/60 backdrop-blur-sm"
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 pt-24 bg-black/90"
                 >
                   <motion.div
                     layoutId={`card-${selectedMission.id}`}
@@ -279,7 +291,7 @@ export default function KioskApp({
       </AnimatePresence>
 
       {/* FOOTER */}
-      <footer className="fixed bottom-0 inset-x-0 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-brand-900)]/40 p-3 flex items-center justify-between text-sm text-[var(--color-text-muted)] z-40">
+      <footer className="fixed bottom-0 inset-x-0 bg-[var(--color-surface)]/95 border-t border-[var(--color-brand-900)]/40 p-3 flex items-center justify-between text-sm text-[var(--color-text-muted)] z-40">
         <div>
            {initialSettings.announcement && <span className="mr-4 font-medium text-[var(--color-brand)]">{initialSettings.announcement}</span>}
            <span>Screen resets after {Math.round(initialSettings.idleMs / 1000)}s of inactivity</span>

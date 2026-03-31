@@ -116,6 +116,20 @@ export default function AdminDashboard() {
                 onChange={e => setSettings({...settings, idleMs: Number(e.target.value)})}
               />
             </label>
+
+            <label className="space-y-2 block">
+              <span className="text-sm text-slate-400 flex justify-between">
+                <span>Google Sheets CSV URL</span>
+                {settings.sheetUrl && <button type="button" onClick={() => fetch('/api/sync', {method:'POST'}).then(() => alert('Manual Sync triggered! Check kiosk.')).catch(e=>alert('Sync failed'))} className="text-emerald-400 text-xs hover:underline">Force Sync Now</button>}
+              </span>
+              <input 
+                type="url" 
+                placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv"
+                className="w-full bg-slate-800 rounded-lg p-3 border border-slate-700"
+                value={settings.sheetUrl || ''} 
+                onChange={e => setSettings({...settings, sheetUrl: e.target.value})}
+              />
+            </label>
           </div>
         </div>
 

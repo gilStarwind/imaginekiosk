@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
   splashSubtitle: 'Touch to discover stories of hope and find your place to serve.',
   splashImage: '/images/general/logo.png',
   webBlocklist: ['wycliffe.org', 'facebook.com', 'rideabilitysc.com'],
+  sheetUrl: 'https://docs.google.com/spreadsheets/d/1jfaWQ7XRGKWjprL-yyNY9cxWXXwszCSEHAYCoQCLEvc/edit?gid=410710739#gid=410710739',
 };
 
 export const DEFAULT_MISSIONS: Mission[] = [

@@ -110,6 +110,8 @@ CHROME_FLAGS=(
   --overscroll-history-navigation=0
   --disable-pinch
   --no-proxy-server
+  --enable-gpu-rasterization
+  --ignore-gpu-blocklist
 )
 
 # If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland
