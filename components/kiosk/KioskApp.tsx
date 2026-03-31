@@ -5,6 +5,7 @@ import { Mission, Settings } from '../../lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, Home, QrCode } from 'lucide-react';
 import Image from 'next/image';
+import QRCode from 'react-qr-code';
 
 type ViewMode = 'splash' | 'home' | 'detail';
 
@@ -18,8 +19,10 @@ export default function KioskApp({
   const [mode, setMode] = useState<ViewMode>('splash');
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [missions, setMissions] = useState<Mission[]>(initialMissions);
+  const [activeQr, setActiveQr] = useState<string | null>(null);
   
   const idleTimer = useRef<NodeJS.Timeout | null>(null);
+  const qrTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Apply visual theme from settings
   useEffect(() => {
@@ -32,6 +35,8 @@ export default function KioskApp({
     idleTimer.current = setTimeout(() => {
       setMode('splash');
       setSelectedMission(null);
+      setActiveQr(null);
+      if (qrTimeout.current) clearTimeout(qrTimeout.current);
       
       // Auto-sync Google Sheet silently in the background when falling back to idle
       if (initialSettings.sheetUrl) {
@@ -44,6 +49,15 @@ export default function KioskApp({
           }).catch(err => console.warn('Background sync failed:', err));
       }
     }, initialSettings.idleMs || 60000);
+  };
+
+  const showQr = (url: string) => {
+    setActiveQr(url);
+    if (qrTimeout.current) clearTimeout(qrTimeout.current);
+    qrTimeout.current = setTimeout(() => {
+      setActiveQr(null);
+    }, 60000);
+    resetIdle();
   };
 
   useEffect(() => {
@@ -264,13 +278,15 @@ export default function KioskApp({
                         {/* Actions block */}
                         <div className="mt-4 pt-6 border-t border-white/10 flex flex-wrap gap-4">
                           {selectedMission.links?.map((link: any, j: number) => (
-                             <a key={j} href={link.href} target="_blank" rel="noreferrer" className="btn-premium px-6 py-3 rounded-full font-bold flex items-center justify-center text-center">
-                               {link.label}
-                             </a>
+                             <button 
+                               key={j} 
+                               onClick={() => showQr(link.href)} 
+                               className="btn-premium px-6 py-3 rounded-full font-bold flex items-center justify-center text-center shadow-lg active:scale-95 transition-transform"
+                             >
+                                <QrCode className="w-5 h-5 mr-2" />
+                                {link.label}
+                             </button>
                           ))}
-                          <button className="glass-panel px-6 py-3 rounded-full font-bold flex items-center gap-2 active:scale-95 transition-transform">
-                             <QrCode className="w-5 h-5" /> Generate QR Code
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -282,6 +298,36 @@ export default function KioskApp({
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
                   </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* QR CODE OVERLAY */}
+            <AnimatePresence>
+              {activeQr && (
+                <motion.div
+                  key="qr-overlay"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm cursor-pointer"
+                  onClick={() => setActiveQr(null)}
+                >
+                  <div className="glass-panel p-10 md:p-14 rounded-[3rem] flex flex-col items-center gap-6 max-w-sm text-center shadow-2xl border-[var(--color-brand)]/50" onClick={(e) => e.stopPropagation()}>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Scan to visit</h3>
+                    <div className="bg-white p-6 rounded-[2rem] shadow-xl w-64 h-64 flex-shrink-0">
+                      <QRCode value={activeQr} size={256} className="w-full h-full" style={{ height: "auto", maxWidth: "100%", width: "100%" }} />
+                    </div>
+                    <p className="text-[var(--color-text-subtle)] text-sm mb-4 break-all px-2 opacity-80 font-medium">
+                      {activeQr}
+                    </p>
+                    <button 
+                      onClick={() => setActiveQr(null)} 
+                      className="btn-premium px-10 py-4 rounded-full font-bold text-lg shadow-lg active:scale-95 transition-transform"
+                    >
+                      Done
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

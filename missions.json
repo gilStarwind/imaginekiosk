@@ -5,7 +5,7 @@
     "subtitle": "",
     "focus": "Give Hope and its partners are seeing positive life change in communities in Haiti, Africa and the US.",
     "involved": "Pray, give, or serve.",
-    "contact": "",
+    "contact": "https://www.givehopeglobal.org",
     "body": "The vision of Give Hope Global is to enable the people we serve to serve others both spiritually and physically. We hope to see these children change their country someday.",
     "image": "/images/missions/givehope_color.png",
     "links": [
@@ -26,8 +26,8 @@
     "image": "/images/missions/rideability.png",
     "links": [
       {
-        "label": "Open",
-        "href": "https://www.rideabilitysc.com"
+        "label": "https://www.rideabilitysc.com",
+        "href": "#"
       }
     ]
   },
@@ -183,7 +183,12 @@
     "involved": "",
     "contact": "https://www.aventuraconsciente.com",
     "body": "Its mission was simple but powerful: to educate society about autism and other forms of neurodivergence—not with pity, but with respect and understanding. She wanted to break the chains of ignorance and build a world where kids like hers were seen, valued, and included.",
-    "image": "./images/mission",
-    "links": []
+    "image": "./images/missions/aventura.png",
+    "links": [
+      {
+        "label": "https://www.aventuraconsciente.com",
+        "href": "#"
+      }
+    ]
   }
 ]
