@@ -82,6 +82,29 @@ apply_rotation_and_mapping() {
 # Apply rotation before starting services
 apply_rotation_and_mapping
 
+# --- Intelligent Auto-Update (Git) ---
+cd "$DIR"
+
+# Wait to verify network is available before checking Github
+if ping -q -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 || ping -q -c 1 -W 2 1.1.1.1 >/dev/null 2>&1; then
+  echo "Internet connection detected. Checking for updates from GitHub..."
+  
+  # Fetch latest changes
+  GIT_OUTPUT=$(git pull origin main 2>&1 || true)
+  echo "$GIT_OUTPUT"
+  
+  # Rebuild if new code was downloaded, or if .next doesn't exist yet
+  if [[ "$GIT_OUTPUT" != *"Already up to date."* ]] || [ ! -d "$DIR/.next" ]; then
+    echo "New code detected! Ensuring dependencies are met and rebuilding Next.js..."
+    npm install
+    npm run build
+  else
+    echo "Files are already up-to-date. Skipping Next.js build."
+  fi
+else
+  echo "Warning: No internet connection found. Booting with existing cached firmware."
+fi
+
 # Start the Next.js production server in the background
 cd "$DIR" && nohup npm run start -- -p "$PORT" \
   > /tmp/kiosk-server.log 2>&1 &
