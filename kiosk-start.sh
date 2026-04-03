@@ -142,6 +142,7 @@ CHROME_FLAGS=(
   --no-proxy-server
   --enable-gpu-rasterization
   --ignore-gpu-blocklist
+  --password-store=basic
 )
 
 # If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland but combine features safely
