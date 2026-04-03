@@ -124,6 +124,8 @@ fi
 # Build Chromium flags
 CHROME_FLAGS=(
   --kiosk
+  --start-fullscreen
+  --window-position=0,0
   --incognito
   --noerrdialogs
   --disable-translate
@@ -137,9 +139,10 @@ CHROME_FLAGS=(
   --ignore-gpu-blocklist
 )
 
-# If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland
+# If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland but combine features safely
 if [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
-  CHROME_FLAGS+=(--enable-features=UseOzonePlatform --ozone-platform=wayland)
+  CHROME_FLAGS=( "${CHROME_FLAGS[@]/--enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching/--enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching,UseOzonePlatform}" )
+  CHROME_FLAGS+=(--ozone-platform=wayland)
 fi
 
 # Launch Chromium in kiosk mode
