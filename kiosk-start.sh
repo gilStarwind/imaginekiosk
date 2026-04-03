@@ -151,7 +151,7 @@ if [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
 fi
 
 # Launch Chromium in kiosk mode
-chromium-browser "http://localhost:${PORT}" "${CHROME_FLAGS[@]}" \
+chromium "http://localhost:${PORT}" "${CHROME_FLAGS[@]}" \
   > /tmp/kiosk-chromium.log 2>&1 &
 
 echo "Kiosk started: http://localhost:${PORT} (logs in /tmp/kiosk-*.log)"
