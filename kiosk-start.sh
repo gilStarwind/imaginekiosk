@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
 # --- Configuration ---
 DIR="$(cd "$(dirname "$0")" && pwd)"
