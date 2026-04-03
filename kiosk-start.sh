@@ -27,6 +27,12 @@ if [ -z "${DISPLAY:-}" ]; then
   export DISPLAY=:0
 fi
 
+# Load NVM (Node Version Manager) if installed, so 'npm' is found securely in GUI/Autostart contexts
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  \. "$NVM_DIR/nvm.sh"
+fi
+
 # Attempt to reuse the desktop session's Xauthority cookie if not provided
 if [ -z "${XAUTHORITY:-}" ]; then
   for candidate in "$HOME/.Xauthority" "/home/imagine/.Xauthority"; do
