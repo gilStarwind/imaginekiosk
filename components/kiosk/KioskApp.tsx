@@ -190,13 +190,13 @@ export default function KioskApp({
                       <div
                         key={mission.id}
                         onClick={() => handleMissionSelect(mission)}
-                        className="glass-panel rounded-3xl overflow-hidden cursor-pointer group active:scale-[0.98] transition-all hover:border-[var(--color-brand-700)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col"
+                        className="glass-panel rounded-3xl overflow-hidden cursor-pointer group active:scale-[0.98] transition-transform flex flex-col"
                       >
                         <div className="h-48 md:h-56 bg-white/5 overflow-hidden flex items-center justify-center p-4">
                            <motion.img
                              src={mission.image}
                              alt={mission.title}
-                             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                             className="w-full h-full object-contain"
                            />
                         </div>
                         <div className="p-6 flex-1 flex flex-col justify-end bg-gradient-to-t from-[var(--color-surface)] to-transparent">
