@@ -153,16 +153,15 @@ CHROME_FLAGS=(
   --password-store=basic
   # Ensures touch coordinates align with CSS pixels on the 32" USB screen
   --force-device-scale-factor=1
-  # Snappier scroll response on Pi 4
   --disable-smooth-scrolling
-  # Force Pi 4's native VideoCore VI EGL path instead of falling back to software GL
   --use-gl=egl
   --enable-zero-copy
 )
 
-# If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland but combine features safely
-if [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
-  CHROME_FLAGS=( "${CHROME_FLAGS[@]/--enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching/--enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching,UseOzonePlatform}" )
+# Pi OS Bookworm (Pi 5 default) runs Wayland. Use WAYLAND_DISPLAY as a reliable
+# fallback since XDG_SESSION_TYPE may not be set in autostart contexts.
+if [ "${XDG_SESSION_TYPE:-}" = "wayland" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+  CHROME_FLAGS=( "${CHROME_FLAGS[@]/--enable-features=TouchInitiatedDrag/--enable-features=TouchInitiatedDrag,UseOzonePlatform}" )
   CHROME_FLAGS+=(--ozone-platform=wayland)
 fi
 
