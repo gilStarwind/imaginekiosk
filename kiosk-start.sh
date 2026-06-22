@@ -74,10 +74,15 @@ apply_rotation_and_mapping() {
       xrandr --output "$OUT" --rotate "$ROTATE" || true
       # Map touchscreen to the rotated output if we can find a touch device
       if command -v xinput >/dev/null 2>&1; then
-        TOUCH_ID=$(xinput list 2>/dev/null | awk -F'=' '/[Tt]ouch|[Tt]ouchscreen/ && /pointer/ {print $2; exit}' | cut -d'\t' -f1)
-        if [ -n "$TOUCH_ID" ]; then
-          xinput map-to-output "$TOUCH_ID" "$OUT" || true
-        fi
+        # USB touchscreens can register after X11 starts — retry a few times
+        for _attempt in 1 2 3; do
+          TOUCH_ID=$(xinput list 2>/dev/null | awk -F'=' '/[Tt]ouch|[Tt]ouchscreen/ && /pointer/ {gsub(/\t.*/,"",$2); print $2; exit}')
+          if [ -n "$TOUCH_ID" ]; then
+            xinput map-to-output "$TOUCH_ID" "$OUT" || true
+            break
+          fi
+          sleep 2
+        done
       fi
     fi
   fi
@@ -136,13 +141,17 @@ CHROME_FLAGS=(
   --disable-translate
   --disable-features=Translate,TabHoverCards
   --touch-events=enabled
-  --enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching
+  --enable-features=TouchInitiatedDrag
   --overscroll-history-navigation=0
   --disable-pinch
   --no-proxy-server
   --enable-gpu-rasterization
   --ignore-gpu-blocklist
   --password-store=basic
+  # Ensures touch coordinates align with CSS pixels on the 32" USB screen
+  --force-device-scale-factor=1
+  # Snappier scroll response on Pi 4
+  --disable-smooth-scrolling
 )
 
 # If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland but combine features safely

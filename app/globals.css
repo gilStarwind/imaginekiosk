@@ -87,16 +87,14 @@
 
 body {
   background: var(--bg-gradient);
-  background-size: 200% 200%;
-  animation: bg-pan 45s ease-in-out infinite;
-  background-attachment: fixed;
   color: var(--text-base);
   min-height: 100vh;
   margin: 0;
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-y;
+  /* manipulation removes the 300ms tap delay without disabling scroll */
+  touch-action: manipulation;
   scrollbar-width: thin;
 }
 
@@ -115,9 +113,11 @@ input, textarea, select {
 }
 
 /* Glassmorphism primitives */
+/* blur(16px) was forcing full-framebuffer compositing every frame on Pi 4's GPU.
+   blur(3px) preserves the frosted look at a fraction of the GPU cost. */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px) saturate(120%);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(3px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
@@ -134,12 +134,6 @@ input, textarea, select {
 }
 .btn-premium:hover {
   filter: brightness(1.1);
-}
-
-@keyframes bg-pan {
-  0% { background-position: 50% 0%; }
-  50% { background-position: 50% 100%; }
-  100% { background-position: 50% 0%; }
 }
 
 @keyframes floaty {

@@ -193,7 +193,6 @@ export default function KioskApp({
                     {missions.map((mission, idx) => (
                       <motion.div
                         key={mission.id}
-                        layoutId={`card-${mission.id}`}
                         onClick={() => handleMissionSelect(mission)}
                         className="glass-panel rounded-3xl overflow-hidden cursor-pointer group active:scale-[0.98] transition-all hover:border-[var(--color-brand-700)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col"
                         initial={{ opacity: 0, y: 30 }}
@@ -201,17 +200,16 @@ export default function KioskApp({
                         transition={{ delay: idx * 0.05 }}
                       >
                         <div className="h-48 md:h-56 bg-white/5 overflow-hidden flex items-center justify-center p-4">
-                           <motion.img 
-                             layoutId={`image-${mission.id}`}
-                             src={mission.image} 
+                           <motion.img
+                             src={mission.image}
                              alt={mission.title}
                              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 will-change-transform"
                            />
                         </div>
                         <div className="p-6 flex-1 flex flex-col justify-end bg-gradient-to-t from-[var(--color-surface)] to-transparent">
-                          <motion.h3 layoutId={`title-${mission.id}`} className="text-2xl font-bold leading-tight mb-2">
+                          <h3 className="text-2xl font-bold leading-tight mb-2">
                             {mission.title}
-                          </motion.h3>
+                          </h3>
                           <p className="text-[var(--color-text-subtle)] text-base line-clamp-2">
                             {mission.focus}
                           </p>
@@ -234,15 +232,17 @@ export default function KioskApp({
                   className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 pt-24 bg-black/90"
                 >
                   <motion.div
-                    layoutId={`card-${selectedMission.id}`}
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.2 }}
                     className="w-full max-w-4xl max-h-full overflow-y-auto glass-panel rounded-[2rem] shadow-2xl border border-[var(--color-brand-700)]/50 bg-[var(--color-surface)]"
                   >
                     <div className="flex flex-col md:flex-row min-h-[400px]">
                       {/* Image side */}
                       <div className="md:w-2/5 md:min-h-full bg-white/5 flex items-center justify-center p-8 border-b md:border-b-0 md:border-r border-[var(--color-brand-900)]/30">
-                        <motion.img 
-                          layoutId={`image-${selectedMission.id}`}
-                          src={selectedMission.image} 
+                        <img
+                          src={selectedMission.image}
                           alt={selectedMission.title}
                           className="w-full max-h-[300px] object-contain"
                         />
@@ -250,9 +250,9 @@ export default function KioskApp({
                       
                       {/* Content side */}
                       <div className="p-8 md:p-10 flex-1 flex flex-col gap-6">
-                        <motion.h2 layoutId={`title-${selectedMission.id}`} className="text-3xl md:text-5xl font-black">
+                        <h2 className="text-3xl md:text-5xl font-black">
                           {selectedMission.title}
-                        </motion.h2>
+                        </h2>
 
                         <div className="space-y-6 text-lg">
                           <div>
