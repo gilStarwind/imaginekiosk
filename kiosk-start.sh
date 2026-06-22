@@ -119,8 +119,11 @@ fi
 cd "$DIR" && nohup npm run start -- -p "$PORT" \
   > /tmp/kiosk-server.log 2>&1 &
 
-# Give the Next.js server a moment to start
-sleep 5
+# Wait for Next.js to be ready instead of sleeping a fixed 5s
+for _i in $(seq 1 30); do
+  curl -sf "http://localhost:${PORT}" >/dev/null 2>&1 && break
+  sleep 1
+done
 
 # Prevent screen blanking
 if command -v xset >/dev/null 2>&1 && xset q >/dev/null 2>&1; then
