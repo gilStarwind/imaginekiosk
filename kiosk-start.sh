@@ -155,6 +155,9 @@ CHROME_FLAGS=(
   --force-device-scale-factor=1
   # Snappier scroll response on Pi 4
   --disable-smooth-scrolling
+  # Force Pi 4's native VideoCore VI EGL path instead of falling back to software GL
+  --use-gl=egl
+  --enable-zero-copy
 )
 
 # If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland but combine features safely

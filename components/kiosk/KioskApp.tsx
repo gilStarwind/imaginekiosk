@@ -88,21 +88,19 @@ export default function KioskApp({
   return (
     <div className="relative min-h-screen overflow-hidden text-[var(--color-text-base)]">
       
-      <AnimatePresence mode="wait">
-        
+      <AnimatePresence mode="sync">
+
         {/* --- SPLASH SCREEN --- */}
         {mode === 'splash' && (
-          <motion.div 
+          <motion.div
             key="splash"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.25 }}
             className="absolute inset-0 z-50 flex flex-col items-center justify-center p-8 text-center cursor-pointer"
             onClick={handleStart}
           >
-            {/* Soft decorative glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--color-brand)] opacity-10 rounded-full blur-[120px] pointer-events-none" />
 
             <div className="glass-panel animate-floaty rounded-[3rem] p-12 md:p-16 flex flex-col items-center gap-8 max-w-2xl relative z-10">
               <div className="w-48 h-48 md:w-64 md:h-64 rounded-3xl overflow-hidden glass-panel border border-[var(--color-brand-700)] shadow-2xl p-4 flex items-center justify-center bg-white/5">
@@ -122,14 +120,12 @@ export default function KioskApp({
                 </p>
               </div>
 
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-4 px-10 py-5 text-2xl font-bold rounded-full btn-premium shadow-[0_0_30px_rgba(0,0,0,0.3)] shadow-[var(--color-brand)]/20"
+              <button
+                className="mt-4 px-10 py-5 text-2xl font-bold rounded-full btn-premium shadow-[0_0_30px_rgba(0,0,0,0.3)] shadow-[var(--color-brand)]/20 active:scale-95 transition-transform"
                 onClick={(e) => { e.stopPropagation(); handleStart(); }}
               >
                 Touch to Begin
-              </motion.button>
+              </button>
             </div>
           </motion.div>
         )}
@@ -171,14 +167,14 @@ export default function KioskApp({
 
             {/* HOME GRID */}
             <main className="flex-1 overflow-y-auto w-full max-w-5xl mx-auto p-6 md:p-8 relative">
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence>
                 {mode === 'home' && (
                   <motion.div
                     key="home-grid"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ staggerChildren: 0.1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-32"
                   >
                     <div className="col-span-1 md:col-span-2 lg:col-span-3 pb-8 text-center mt-4">
@@ -190,14 +186,11 @@ export default function KioskApp({
                        </p>
                     </div>
 
-                    {missions.map((mission, idx) => (
-                      <motion.div
+                    {missions.map((mission) => (
+                      <div
                         key={mission.id}
                         onClick={() => handleMissionSelect(mission)}
                         className="glass-panel rounded-3xl overflow-hidden cursor-pointer group active:scale-[0.98] transition-all hover:border-[var(--color-brand-700)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col"
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.05 }}
                       >
                         <div className="h-48 md:h-56 bg-white/5 overflow-hidden flex items-center justify-center p-4">
                            <motion.img
@@ -214,7 +207,7 @@ export default function KioskApp({
                             {mission.focus}
                           </p>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </motion.div>
                 )}
@@ -293,7 +286,7 @@ export default function KioskApp({
                     {/* Close button top right of modal */}
                     <button 
                       onClick={() => setMode('home')}
-                      className="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 backdrop-blur-md"
+                      className="absolute top-4 right-4 bg-black/60 text-white rounded-full p-2"
                     >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
@@ -310,7 +303,7 @@ export default function KioskApp({
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm cursor-pointer"
+                  className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 cursor-pointer"
                   onClick={() => setActiveQr(null)}
                 >
                   <div className="glass-panel p-10 md:p-14 rounded-[3rem] flex flex-col items-center gap-6 max-w-sm text-center shadow-2xl border-[var(--color-brand)]/50" onClick={(e) => e.stopPropagation()}>
