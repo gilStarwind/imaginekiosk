@@ -74,10 +74,15 @@ apply_rotation_and_mapping() {
       xrandr --output "$OUT" --rotate "$ROTATE" || true
       # Map touchscreen to the rotated output if we can find a touch device
       if command -v xinput >/dev/null 2>&1; then
-        TOUCH_ID=$(xinput list 2>/dev/null | awk -F'=' '/[Tt]ouch|[Tt]ouchscreen/ && /pointer/ {print $2; exit}' | cut -d'\t' -f1)
-        if [ -n "$TOUCH_ID" ]; then
-          xinput map-to-output "$TOUCH_ID" "$OUT" || true
-        fi
+        # USB touchscreens can register after X11 starts — retry a few times
+        for _attempt in 1 2 3; do
+          TOUCH_ID=$(xinput list 2>/dev/null | awk -F'=' '/[Tt]ouch|[Tt]ouchscreen/ && /pointer/ {gsub(/\t.*/,"",$2); print $2; exit}')
+          if [ -n "$TOUCH_ID" ]; then
+            xinput map-to-output "$TOUCH_ID" "$OUT" || true
+            break
+          fi
+          sleep 2
+        done
       fi
     fi
   fi
@@ -114,8 +119,11 @@ fi
 cd "$DIR" && nohup npm run start -- -p "$PORT" \
   > /tmp/kiosk-server.log 2>&1 &
 
-# Give the Next.js server a moment to start
-sleep 5
+# Wait for Next.js to be ready instead of sleeping a fixed 5s
+for _i in $(seq 1 30); do
+  curl -sf "http://localhost:${PORT}" >/dev/null 2>&1 && break
+  sleep 1
+done
 
 # Prevent screen blanking
 if command -v xset >/dev/null 2>&1 && xset q >/dev/null 2>&1; then
@@ -136,18 +144,24 @@ CHROME_FLAGS=(
   --disable-translate
   --disable-features=Translate,TabHoverCards
   --touch-events=enabled
-  --enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching
+  --enable-features=TouchInitiatedDrag
   --overscroll-history-navigation=0
   --disable-pinch
   --no-proxy-server
   --enable-gpu-rasterization
   --ignore-gpu-blocklist
   --password-store=basic
+  # Ensures touch coordinates align with CSS pixels on the 32" USB screen
+  --force-device-scale-factor=1
+  --disable-smooth-scrolling
+  --use-gl=egl
+  --enable-zero-copy
 )
 
-# If running on Wayland (Pi OS Bookworm default), prefer Ozone Wayland but combine features safely
-if [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
-  CHROME_FLAGS=( "${CHROME_FLAGS[@]/--enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching/--enable-features=TouchInitiatedDrag,TouchpadAndWheelScrollLatching,UseOzonePlatform}" )
+# Pi OS Bookworm (Pi 5 default) runs Wayland. Use WAYLAND_DISPLAY as a reliable
+# fallback since XDG_SESSION_TYPE may not be set in autostart contexts.
+if [ "${XDG_SESSION_TYPE:-}" = "wayland" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+  CHROME_FLAGS=( "${CHROME_FLAGS[@]/--enable-features=TouchInitiatedDrag/--enable-features=TouchInitiatedDrag,UseOzonePlatform}" )
   CHROME_FLAGS+=(--ozone-platform=wayland)
 fi
 
