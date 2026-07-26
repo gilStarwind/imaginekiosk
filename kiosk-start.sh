@@ -65,8 +65,9 @@ apply_rotation_and_mapping() {
       inverted) WL_ANGLE=180 ;;
       left) WL_ANGLE=270 ;;
     esac
-    # Find first enabled output
-    OUT=$(wlr-randr | awk '/enabled/{print name}{name=$1}' | head -n1)
+    # Find first enabled output (wlr-randr prints "Enabled: yes", capital E —
+    # match case-insensitively so this doesn't silently no-op)
+    OUT=$(wlr-randr | awk 'tolower($0) ~ /enabled: yes/{print name}{name=$1}' | head -n1)
     if [ -n "$OUT" ]; then
       WLR_ARGS=(--output "$OUT" --transform "$WL_ANGLE")
       # Force a specific mode (e.g. "1920x1080@60.000000Hz") if configured —
