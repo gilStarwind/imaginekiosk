@@ -9,9 +9,11 @@ if [ -f "$CONFIG_FILE" ] && command -v jq >/dev/null; then
   # Use `jq -r` to get raw string; add fallback `// "default"`
   PORT_FROM_CONFIG=$(jq -r '.port // "8080"' "$CONFIG_FILE")
   ROTATE_FROM_CONFIG=$(jq -r '.screenRotation // "normal"' "$CONFIG_FILE")
+  MODE_FROM_CONFIG=$(jq -r '.displayMode // ""' "$CONFIG_FILE")
   # jq returns "null" for missing keys; treat it as empty
   [ "$PORT_FROM_CONFIG" = "null" ] && PORT_FROM_CONFIG=""
   [ "$ROTATE_FROM_CONFIG" = "null" ] && ROTATE_FROM_CONFIG=""
+  [ "$MODE_FROM_CONFIG" = "null" ] && MODE_FROM_CONFIG=""
 elif [ -f "$CONFIG_FILE" ]; then
     echo "Warning: 'jq' command not found. Cannot read from config.json. Using defaults." >&2
 fi
@@ -19,6 +21,7 @@ fi
 # Precedence: command-line arg -> env var -> config file -> default
 PORT="${1:-${PORT:-${PORT_FROM_CONFIG:-8080}}}"
 ROTATE="${2:-${ROTATE:-${ROTATE_FROM_CONFIG:-normal}}}"
+MODE="${3:-${MODE:-${MODE_FROM_CONFIG:-}}}"
 
 # --- Environment Setup ---
 # Ensure we point at the active X display when launched from SSH/TTY
@@ -55,7 +58,7 @@ apply_rotation_and_mapping() {
     *) echo "Unknown ROTATE value: $ROTATE (use left|right|inverted|normal)" >&2; return 0 ;;
   esac
 
-  if [ "${XDG_SESSION_TYPE:-x11}" = "wayland" ] && command -v wlr-randr >/dev/null 2>&1; then
+  if { [ "${XDG_SESSION_TYPE:-}" = "wayland" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; } && command -v wlr-randr >/dev/null 2>&1; then
     # Map xrandr terms to wlr-randr angles (clockwise)
     case "$ROTATE" in
       right) WL_ANGLE=90 ;;
@@ -65,7 +68,11 @@ apply_rotation_and_mapping() {
     # Find first enabled output
     OUT=$(wlr-randr | awk '/enabled/{print name}{name=$1}' | head -n1)
     if [ -n "$OUT" ]; then
-      wlr-randr --output "$OUT" --transform "$WL_ANGLE" || true
+      WLR_ARGS=(--output "$OUT" --transform "$WL_ANGLE")
+      # Force a specific mode (e.g. "1920x1080@60.000000Hz") if configured —
+      # useful when the panel's native/preferred mode is too high-res for the UI
+      [ -n "$MODE" ] && WLR_ARGS+=(--mode "$MODE")
+      wlr-randr "${WLR_ARGS[@]}" || true
     fi
   elif command -v xrandr >/dev/null 2>&1; then
     # Determine active output (prefer primary)
