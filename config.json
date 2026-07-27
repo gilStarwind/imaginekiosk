@@ -1,7 +1,6 @@
 {
   "announcement": "",
-  "screenRotation": "left",
-  "displayMode": "1920x1080@60.000000Hz",
+  "screenRotation": "normal",
   "idleMs": 60000,
   "highlightMs": 10000,
   "theme": "ember",
