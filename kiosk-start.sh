@@ -65,9 +65,12 @@ apply_rotation_and_mapping() {
       inverted) WL_ANGLE=180 ;;
       left) WL_ANGLE=270 ;;
     esac
-    # Find first enabled output (wlr-randr prints "Enabled: yes", capital E —
-    # match case-insensitively so this doesn't silently no-op)
-    OUT=$(wlr-randr | awk 'tolower($0) ~ /enabled: yes/{print name}{name=$1}' | head -n1)
+    # Find first enabled output. Output header lines are unindented (e.g.
+    # "HDMI-A-1 ..."); property lines (Make/Model/Serial/Physical size/
+    # Enabled/...) are indented, so track the most recent header line and
+    # emit it when its "Enabled: yes" property is seen (case-insensitive,
+    # since wlr-randr capitalizes it).
+    OUT=$(wlr-randr | awk '/^[^ ]/{name=$1} tolower($0) ~ /enabled: yes/{print name}' | head -n1)
     if [ -n "$OUT" ]; then
       WLR_ARGS=(--output "$OUT" --transform "$WL_ANGLE")
       # Force a specific mode (e.g. "1920x1080@60.000000Hz") if configured —
