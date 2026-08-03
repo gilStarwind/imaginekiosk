@@ -1,6 +1,6 @@
 {
   "announcement": "",
-  "screenRotation": "normal",
+  "screenRotation": "left",
   "idleMs": 60000,
   "highlightMs": 10000,
   "theme": "ember",
